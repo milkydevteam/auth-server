@@ -26,11 +26,11 @@ async function deleteSession(accessToken) {
   await Session.deleteMany({ accessToken });
 }
 
-async function generateAccessToken(userId) {
-  const accessToken = jwt.sign({ user_id: userId }, JWT_SECRET_KEY, {
+async function generateAccessToken(data) {
+  const accessToken = jwt.sign(data, JWT_SECRET_KEY, {
     expiresIn: JWT_EXPIRES_TIME,
   });
-  createSession(userId, accessToken);
+  createSession(data.userId, accessToken);
 
   return accessToken;
 }
@@ -85,9 +85,9 @@ async function registerWithSocial(data) {
 }
 
 async function register(data) {
-  const { email, password, accName } = data;
+  const { email, password, userName } = data;
   const isAccountExist = await Account.findOne({
-    $or: [{ email }, { accName }],
+    $or: [{ email }, { userName }],
   });
   if (isAccountExist) throw new CustomError(errorCodes.USER_ALREADY_EXISTS);
 
@@ -97,7 +97,7 @@ async function register(data) {
 
   await Account.create({
     _id,
-    accName,
+    userName,
     email,
     password: await encryptPassword(password, salt),
     salt,
@@ -106,18 +106,19 @@ async function register(data) {
   await UserService.createUser(_id, data);
 }
 
-async function login(email, password) {
-  const user = await User.findOne({ email });
-  if (!user) throw new CustomError(errorCodes.ACCOUNT_NOT_FOUND);
-  if (user.status === type.accStatus.inactive)
+async function login(userName, password) {
+  const account = await Account.findOne({ userName });
+  if (!account) throw new CustomError(errorCodes.ACCOUNT_NOT_FOUND);
+  if (account.status === type.accStatus.inactive)
     throw new CustomError(errorCodes.BLOCK_USER);
-  const { _id: userId } = user;
+  const { _id: userId } = account;
   const isCorrectPassword = await compareBcrypt(
     hashSHA512(password),
-    decrypt(user.password),
+    decrypt(account.password),
   );
-  if (!isCorrectPassword) throw new CustomError(errorCodes.DIFFERENT_PASSWORD);
-  const accessToken = await generateAccessToken(userId);
+  if (!isCorrectPassword) throw new CustomError(errorCodes.ACCOUNT_NOT_FOUND);
+  const user = await UserService.getUserById(userId);
+  const accessToken = await generateAccessToken({ userId, name: user.name });
   return accessToken;
 }
 

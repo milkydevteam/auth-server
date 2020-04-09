@@ -5,7 +5,7 @@ const accountSchema = new mongoose.Schema(
   {
     _id: Number,
     email: String,
-    accName: String,
+    userName: String,
     password: String,
     salt: String,
     status: { type: String, default: 1 }, // online: 1, offline: 0
