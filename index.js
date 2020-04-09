@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const compression = require('compression');
 const bodyParser = require('body-parser');
@@ -9,9 +11,9 @@ const camelcaseRequest = require('./src/middlewares/camelCaseReq');
 const snakecaseResponse = require('./src/middlewares/snakeCaseRes');
 
 // import route
-const auths = require('./src/routes/authRoute');
+const authRoutes = require('./src/routes/authRoute');
+const userRoutes = require('./src/routes/userRoutes');
 
-require('dotenv').config();
 require('./src/models');
 
 const app = express();
@@ -26,7 +28,8 @@ app.use(camelcaseRequest);
 app.disable('x-powered-by');
 app.use(snakecaseResponse());
 
-app.use('/auths', auths);
+app.use('/auths', authRoutes);
+app.use('/users', userRoutes);
 
 app.use('/', (req, res) => {
   res.send({ status: 1, message: 'Server Auth Milky' });

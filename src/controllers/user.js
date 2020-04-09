@@ -9,10 +9,7 @@ async function getUserById(req, res) {
 
 async function getUsers(req, res) {
   try {
-    const data = await userService.findAll(
-      {},
-      { roles: 1, groupIds: 1, email: 1, status: 1, ...req.query },
-    );
+    const data = await userService.findAll({}, { name: 1, email: 1 });
     res.send({ result: { data }, status: 1 });
   } catch (error) {
     console.log('getUsers', error.message);

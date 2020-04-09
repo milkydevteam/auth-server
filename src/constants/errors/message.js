@@ -14,6 +14,8 @@ function getErrorMessage(code) {
       return 'Người dùng không tồn tại';
     case codes.BLOCK_USER:
       return 'Tài khoản của bạn đã bị khóa';
+    case codes.ACCOUNT_NOT_FOUND:
+      return 'Tài khoản hoặc mật khẩu không đúng';
     default:
       return null;
   }

@@ -69,7 +69,6 @@ async function compareBcrypt(data, hashed) {
 async function encryptPassword(password, salt) {
   // Transform the plaintext password to hash value using SHA512
   const hashedSHA512 = hashSHA512(password);
-
   // Hash using bcrypt with a cost of 10 and unique, per-user salt
   const hashedBcrypt = await hashBcrypt(hashedSHA512, salt);
 
@@ -109,7 +108,7 @@ async function register(data) {
 
 async function login(email, password) {
   const user = await User.findOne({ email });
-  if (!user) throw new CustomError(errorCodes.NOT_FOUND_EMAIL);
+  if (!user) throw new CustomError(errorCodes.ACCOUNT_NOT_FOUND);
   if (user.status === type.accStatus.inactive)
     throw new CustomError(errorCodes.BLOCK_USER);
   const { _id: userId } = user;

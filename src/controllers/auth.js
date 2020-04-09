@@ -1,14 +1,24 @@
 const authService = require('../services/auth');
 
 async function login(req, res) {
-  const { email, password } = req.body;
-  const accessToken = await authService.login(email, password);
-  return res.send({ status: 1, result: { accessToken } });
+  try {
+    const { email, password } = req.body;
+    const accessToken = await authService.login(email, password);
+    res.send({ status: 1, result: { accessToken } });
+  } catch (error) {
+    console.log('login error', error);
+    res.send({ status: 0, message: error.message });
+  }
 }
 
 async function register(req, res) {
-  await authService.register(req.body);
-  return res.send({ status: 1 });
+  try {
+    await authService.register(req.body);
+    res.send({ status: 1 });
+  } catch (error) {
+    console.log('register error', error);
+    res.send({ status: 0, message: error.message });
+  }
 }
 
 async function logout(req, res) {
