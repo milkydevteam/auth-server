@@ -38,6 +38,6 @@ app.use('/', (req, res) => {
 app.use(errorHandler);
 
 const { PORT } = process.env;
-app.listen(PORT, () => {
+app.listen(PORT || 3000, () => {
   console.log(`Server is running on port ${PORT}`);
 });
