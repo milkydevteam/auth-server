@@ -8,29 +8,29 @@ const errorCodes = require('../constants/errors/code');
 const User = require('../models/user');
 const UserService = require('./user');
 const Account = require('../models/account');
-const Session = require('../models/session');
+// const Session = require('../models/session');
 const Counter = require('../models/counter');
 const { encrypt, decrypt } = require('../utils/security');
-const Redis = require('../utils/redis');
+// const Redis = require('../utils/redis');
 const type = require('../constants/type');
 
 const { JWT_SECRET_KEY, JWT_EXPIRES_TIME } = process.env;
 
-async function createSession(userId, accessToken) {
-  await Redis.setAsync(accessToken, JSON.stringify({ userId }));
-  await Session.create({ userId, accessToken });
-}
+// async function createSession(userId, accessToken) {
+//   await Redis.setAsync(accessToken, JSON.stringify({ userId }));
+//   await Session.create({ userId, accessToken });
+// }
 
-async function deleteSession(accessToken) {
-  await Redis.delAsync(accessToken);
-  await Session.deleteMany({ accessToken });
-}
+// async function deleteSession(accessToken) {
+//   await Redis.delAsync(accessToken);
+//   await Session.deleteMany({ accessToken });
+// }
 
 async function generateAccessToken(data) {
   const accessToken = jwt.sign(data, JWT_SECRET_KEY, {
     expiresIn: JWT_EXPIRES_TIME,
   });
-  createSession(data.userId, accessToken);
+  // createSession(data.userId, accessToken);
 
   return accessToken;
 }
@@ -123,7 +123,7 @@ async function login(userName, password) {
 }
 
 async function logout(accessToken) {
-  await deleteSession(accessToken);
+  // await deleteSession(accessToken);
 }
 
 async function verifyAccessToken(token = '') {
@@ -136,11 +136,11 @@ async function verifyAccessToken(token = '') {
       // eslint-disable-next-line
       accessToken = tokenSplit[1];
     }
-    const session = await Redis.getAsync(accessToken);
-    if (!session) {
-      const sessionInDb = await Session.findOne({ accessToken });
-      if (!sessionInDb) throw new CustomError(errorCodes.UNAUTHORIZED);
-    }
+    // const session = await Redis.getAsync(accessToken);
+    // if (!session) {
+    //   const sessionInDb = await Session.findOne({ accessToken });
+    //   if (!sessionInDb) throw new CustomError(errorCodes.UNAUTHORIZED);
+    // }
 
     const data = await jwt.verify(accessToken, JWT_SECRET_KEY);
     const { user_id: userId } = data;
