@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema(
     phone: String,
     major: [String],
     jobType: [String], // freelance, fulltime, parttime, remote
+    url: String,
   },
   {
     versionKey: false,

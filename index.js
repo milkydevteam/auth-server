@@ -28,10 +28,10 @@ app.use(camelcaseRequest);
 app.disable('x-powered-by');
 app.use(snakecaseResponse());
 
-app.use('/auths', authRoutes);
+app.use('/', authRoutes);
 app.use('/users', userRoutes);
 
-app.use('/', (req, res) => {
+app.use('/test', (req, res) => {
   res.send({ status: 1, message: 'Server Auth Milky' });
 });
 

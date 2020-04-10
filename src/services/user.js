@@ -3,12 +3,13 @@ const errorCodes = require('../constants/errors/code');
 const User = require('../models/user');
 
 async function createUser(_id, data) {
-  const { name, address, phone } = data;
+  const { name, address, phone, userName } = data;
   await User.create({
     _id,
     name,
     address,
     phone,
+    url: userName,
   });
 }
 
