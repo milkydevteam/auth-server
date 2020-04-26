@@ -1,4 +1,5 @@
 const authService = require('../services/auth');
+const { CustomError, code } = require('../constants/errors');
 
 async function login(req, res) {
   try {
@@ -6,17 +7,26 @@ async function login(req, res) {
     const accessToken = await authService.login(userName, password);
     res.send({ status: 1, result: { accessToken } });
   } catch (error) {
-    console.log('login error', error);
     res.send({ status: 0, message: error.message });
   }
 }
 
 async function register(req, res) {
   try {
+    if (!req.body) {
+      throw new CustomError(code.REGISTER_INCLUDE);
+    }
+    const isExist = ['email', 'userName', 'password', 'name'].every(param => {
+      return Object.keys(req.body).includes(param);
+    });
+
+    if (!isExist) {
+      throw new CustomError(code.REGISTER_INCLUDE);
+    }
+
     await authService.register(req.body);
     res.send({ status: 1 });
   } catch (error) {
-    console.log('register error', error);
     res.send({ status: 0, message: error.message });
   }
 }

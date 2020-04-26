@@ -1,0 +1,10 @@
+{
+  "REGISTER_INCLUDE": "You must include email, userName, password, name",
+  "USER_ALREADY_EXISTS": "User already exist",
+  "NOT_ACCESSED": "You do not have access",
+  "NOT_FOUND_EMAIL": "Email not invalid",
+  "DIFFERENT_PASSWORD": "Password is incorrect",
+  "USER_NOT_FOUND": "User not found",
+  "BLOCK_USER": "Your account is blocked",
+  "ACCOUNT_NOT_FOUND": "Username or password not incorrect"
+}

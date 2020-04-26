@@ -1,21 +1,24 @@
 const codes = require('./code');
+const { t } = require('../language');
 
 function getErrorMessage(code) {
   switch (code) {
     case codes.USER_ALREADY_EXISTS:
-      return 'Tài khoản đã tồn tại!';
+      return t('USER_ALREADY_EXISTS');
     case codes.NOT_ACCESSED:
-      return 'Bạn không được phép thực hiện công việc!';
+      return t('NOT_ACCESSED');
     case codes.NOT_FOUND_EMAIL:
-      return 'Email của bạn chưa đúng!';
+      return t('NOT_FOUND_EMAIL');
     case codes.DIFFERENT_PASSWORD:
-      return 'Mật khẩu của bạn chưa đúng!';
+      return t('DIFFERENT_PASSWORD');
     case codes.USER_NOT_FOUND:
-      return 'Người dùng không tồn tại';
+      return t('USER_NOT_FOUND');
     case codes.BLOCK_USER:
-      return 'Tài khoản của bạn đã bị khóa';
+      return t('BLOCK_USER');
     case codes.ACCOUNT_NOT_FOUND:
-      return 'Tài khoản hoặc mật khẩu không đúng';
+      return t('ACCOUNT_NOT_FOUND');
+    case codes.REGISTER_INCLUDE:
+      return t('REGISTER_INCLUDE');
     default:
       return null;
   }
