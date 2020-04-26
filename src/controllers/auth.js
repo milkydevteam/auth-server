@@ -55,9 +55,10 @@ async function verifyAccessToken(req, res) {
 }
 
 async function changePassword(req, res) {
-  const { password, newPassword, userId } = req.body;
-  await authService.changePassword(userId, password, newPassword);
-  return res.send({ status: 1 });
+  // const { password, newPassword, userId } = req.body;
+  // await authService.changePassword(userId, password, newPassword);
+  console.log(req.user);
+  return res.send({ status: 1, user: req.user });
 }
 
 module.exports = {

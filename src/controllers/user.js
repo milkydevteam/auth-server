@@ -1,6 +1,25 @@
 const userService = require('../services/user');
 const { CustomError, code } = require('../constants/errors');
 
+async function getOwnerProfile(req, res) {
+  try {
+    if (req.user) {
+      const { userId } = req.user;
+      const user = await userService.getUserById({ _id: userId });
+      return res.send({ status: 1, result: { user } });
+    }
+    return res.send({
+      status: 0,
+      message: 'Unauthorized',
+    });
+  } catch (error) {
+    return res.send({
+      status: 0,
+      message: error.message,
+    });
+  }
+}
+
 async function getUserById(req, res) {
   const { userId } = req.params;
   const user = await userService.getUserById({ _id: userId });
@@ -12,7 +31,6 @@ async function getUsers(req, res) {
     const data = await userService.findAll({}, { name: 1, email: 1 });
     res.send({ result: { data }, status: 1 });
   } catch (error) {
-    console.log('getUsers', error.message);
     res.send({ message: error.message, status: -1 });
   }
 }
@@ -52,7 +70,6 @@ async function searchByEmail(req, res) {
 async function getUserByEmail(req, res) {
   const { email } = req.query;
   const user = await userService.findByEmail(email);
-  console.log(user);
   return res.send({ status: 1, result: { user } });
 }
 module.exports = {
@@ -62,4 +79,5 @@ module.exports = {
   searchByEmail,
   update,
   getUserByEmail,
+  getOwnerProfile,
 };

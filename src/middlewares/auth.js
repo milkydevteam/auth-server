@@ -12,7 +12,7 @@ async function auth(req, res, next) {
   const { user } = await authService.verifyAccessToken(accessToken);
 
   if (user) {
-    req.userId = {
+    req.user = {
       userId: user._id,
       roles: user.roles,
     };

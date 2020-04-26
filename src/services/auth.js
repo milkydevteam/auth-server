@@ -127,32 +127,27 @@ async function logout(accessToken) {
 }
 
 async function verifyAccessToken(token = '') {
-  try {
-    const tokenSplit = token.split(' ');
-    let accessToken = '';
-    if (tokenSplit.length === 1) {
-      [accessToken] = tokenSplit;
-    } else {
-      // eslint-disable-next-line
-      accessToken = tokenSplit[1];
-    }
-    // const session = await Redis.getAsync(accessToken);
-    // if (!session) {
-    //   const sessionInDb = await Session.findOne({ accessToken });
-    //   if (!sessionInDb) throw new CustomError(errorCodes.UNAUTHORIZED);
-    // }
-
-    const data = await jwt.verify(accessToken, JWT_SECRET_KEY);
-    const { user_id: userId } = data;
-    const user = await User.findById(userId);
-
-    if (!user) throw new CustomError(errorCodes.UNAUTHORIZED);
-    if (user.status === type.accStatus.inactive)
-      throw new CustomError(errorCodes.BLOCK_USER);
-    return { data, user: user.toJSON() };
-  } catch (error) {
-    return {};
+  const tokenSplit = token.split(' ');
+  let accessToken = '';
+  if (tokenSplit.length === 1) {
+    [accessToken] = tokenSplit;
+  } else {
+    // eslint-disable-next-line
+    accessToken = tokenSplit[1];
   }
+  // const session = await Redis.getAsync(accessToken);
+  // if (!session) {
+  //   const sessionInDb = await Session.findOne({ accessToken });
+  //   if (!sessionInDb) throw new CustomError(errorCodes.UNAUTHORIZED);
+  // }
+
+  const data = await jwt.verify(accessToken, JWT_SECRET_KEY);
+  const { userId } = data;
+  const user = await User.findById(userId);
+  if (!user) throw new CustomError(errorCodes.UNAUTHORIZED);
+  if (user.status === type.accStatus.inactive)
+    throw new CustomError(errorCodes.BLOCK_USER);
+  return { data, user: user.toJSON() };
 }
 
 async function changePassword(
