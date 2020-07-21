@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import * as userController from '../controllers/user';
 import auth from '../middlewares/auth';
-import asyncMiddleware from 'src/middlewares/async';
+import asyncMiddleware from '../middlewares/async';
 const router = Router();
 
 router.get('/me', auth, asyncMiddleware(userController.getOwnerProfile));
