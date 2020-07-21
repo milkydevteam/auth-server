@@ -1,33 +1,24 @@
-const fs = require('fs');
-const path = require('path');
-
-const prettierOptions = JSON.parse(
-  fs.readFileSync(path.resolve(__dirname, '.prettierrc'), 'utf8'),
-);
-
 module.exports = {
-  extends: ['airbnb-base', 'prettier'],
-  plugins: ['prettier'],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    project: 'tsconfig.json',
+    sourceType: 'module',
+  },
+  plugins: ['@typescript-eslint/eslint-plugin'],
+  extends: [
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended',
+    'prettier',
+    'prettier/@typescript-eslint',
+  ],
+  root: true,
   env: {
-    browser: true,
     node: true,
-    es6: true,
+    jest: true,
   },
   rules: {
-    'prettier/prettier': ['error', prettierOptions],
-    'no-underscore-dangle': 0,
-    'no-param-reassign': 0,
-    'no-await-in-loop': 0,
-    'no-use-before-define': 0,
-    'no-restricted-syntax': 0,
-    'global-require': 0,
-    'prefer-destructuring': [
-      'error',
-      {
-        array: false,
-        object: true,
-      },
-    ],
+    '@typescript-eslint/interface-name-prefix': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
   },
-  globals: {},
 };

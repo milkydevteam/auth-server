@@ -1,5 +1,4 @@
 require('dotenv').config();
-
 const express = require('express');
 const compression = require('compression');
 const bodyParser = require('body-parser');
@@ -31,8 +30,17 @@ app.use(snakecaseResponse());
 app.use('/', authRoutes);
 app.use('/users', userRoutes);
 
-app.use('/test', (req, res) => {
-  res.send({ status: 1, message: 'Server Auth Milky' });
+app.use('/connect', (req, res) => {
+  res.send(`
+    <div style="
+          height: 100%;
+          display: flex;
+          flex: 1;
+          align-items: center;
+          justify-content: center">
+      <h1 style="color: #717171">Milky Auth Server!</h1>
+    </div>
+    `);
 });
 
 app.use(errorHandler);

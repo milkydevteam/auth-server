@@ -1,8 +1,7 @@
+import CustomError from '../constants/errors/CustomError';
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
-const CustomError = require('../constants/errors/CustomError');
 const errorCodes = require('../constants/errors/code');
 
 const User = require('../models/user');
