@@ -16,4 +16,4 @@ sessionSchema.index({ accessToken: -1, userId: -1 });
 const Session = mongoose.model('Session', sessionSchema);
 Session.createIndexes();
 
-module.exports = Session;
+export default Session;

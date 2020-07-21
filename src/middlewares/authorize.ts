@@ -1,8 +1,8 @@
-const CustomError = require('../constants/errors/CustomError');
-const codes = require('../constants/errors/code');
+import CustomError from '../constants/errors/CustomError';
+import codes from '../constants/errors/code';
+import * as roleService from '../services/role';
+import asyncMiddleware from './async';
 // const Permission = require('../models/permission');
-const roleService = require('../services/role');
-const asyncMiddleware = require('./async');
 
 async function authorize(req, res, next) {
   const { account } = req;
@@ -10,7 +10,7 @@ async function authorize(req, res, next) {
     method,
     route: { path: routePath },
   } = req;
-  return next;
+  return next();
   // const permission = await Permission.findOne({
   //   backendKey: { method, routePath },
   // });
@@ -23,4 +23,5 @@ async function authorize(req, res, next) {
   // throw new CustomError(codes.FORBIDDEN);
 }
 
-module.exports = asyncMiddleware(authorize);
+const asyncAuthorize = asyncMiddleware(authorize);
+export default asyncAuthorize;

@@ -1,12 +1,14 @@
-const router = require('express').Router();
-const authController = require('../controllers/auth');
+import { Router } from 'express';
+import auth from '../middlewares/auth';
+import * as authController from '../controllers/auth';
+import asyncMiddleware from 'src/middlewares/async';
 
-const auth = require('../middlewares/auth');
+const router = Router();
 
-router.get('/verify', authController.verifyAccessToken);
-router.post('/login', authController.login);
-router.post('/register', authController.register);
-router.put('/change-password', auth, authController.changePassword);
-router.post('/logout', authController.logout);
+router.get('/verify', asyncMiddleware(authController.verifyAccessToken));
+router.post('/login', asyncMiddleware(authController.login));
+router.post('/register', asyncMiddleware(authController.register));
+router.put('/change-password', asyncMiddleware(authController.changePassword));
+router.post('/logout', asyncMiddleware(authController.logout));
 
-module.exports = router;
+export default router;

@@ -1,6 +1,6 @@
-const messages = require('./message');
+import messages from './message';
 
-class CustomError extends Error {
+export default class CustomError extends Error {
   constructor(code, ...params) {
     super(...params);
     if (Error.captureStackTrace) {
@@ -9,6 +9,5 @@ class CustomError extends Error {
     this.code = code;
     this.message = messages(code);
   }
+  code: number;
 }
-
-module.exports = CustomError;

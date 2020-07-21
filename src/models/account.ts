@@ -1,5 +1,5 @@
+import { langKey } from '../constants/language';
 const mongoose = require('mongoose');
-const lang = require('../constants/language');
 
 const accountSchema = new mongoose.Schema(
   {
@@ -11,7 +11,7 @@ const accountSchema = new mongoose.Schema(
     status: { type: String, default: 1 }, // online: 1, offline: 0
     active: { type: String, default: 1 }, // active: 1, inactive: 0
     roles: [Number],
-    language: { type: String, default: lang.lang.VI },
+    language: { type: String, default: langKey.VI },
     lastRequestTime: Number,
   },
   {
@@ -20,4 +20,5 @@ const accountSchema = new mongoose.Schema(
   },
 );
 
-module.exports = mongoose.model('Account', accountSchema);
+const AccountModel = mongoose.model('Account', accountSchema);
+export default AccountModel;

@@ -1,4 +1,4 @@
-module.exports = {
+const code = {
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
   FORBIDDEN: 403,
@@ -15,3 +15,5 @@ module.exports = {
   ACCOUNT_NOT_FOUND: 1009,
   REGISTER_INCLUDE: 1010,
 };
+
+export default code;

@@ -1,7 +1,7 @@
-const asyncMiddleware = require('./async');
+import asyncMiddleware from './async';
+import * as authService from '../services/auth';
 const CustomError = require('../constants/errors/CustomError');
 const codes = require('../constants/errors/code');
-const authService = require('../services/auth');
 
 async function auth(req, res, next) {
   const { authorization } = req.headers;
@@ -23,4 +23,5 @@ async function auth(req, res, next) {
   return next();
 }
 
-module.exports = asyncMiddleware(auth);
+const asyncAuth = asyncMiddleware(auth);
+export default asyncAuth;

@@ -2,16 +2,16 @@ import CustomError from '../constants/errors/CustomError';
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const errorCodes = require('../constants/errors/code');
+import errorCodes from '../constants/errors/code';
 
-const User = require('../models/user');
-const UserService = require('./user');
-const Account = require('../models/account');
+import UserModel from '../models/user';
+import Account from '../models/account';
+import * as UserService from './user';
+import Counter from '../models/counter';
 // const Session = require('../models/session');
-const Counter = require('../models/counter');
 const { encrypt, decrypt } = require('../utils/security');
 // const Redis = require('../utils/redis');
-const type = require('../constants/type');
+import * as type from '../constants/type';
 
 const { JWT_SECRET_KEY, JWT_EXPIRES_TIME } = process.env;
 
@@ -88,10 +88,12 @@ async function register(data) {
   const isAccountExist = await Account.findOne({
     $or: [{ email }, { userName }],
   });
-  if (isAccountExist) throw new CustomError(errorCodes.USER_ALREADY_EXISTS);
-
+  if (isAccountExist) {
+    throw new CustomError(errorCodes.USER_ALREADY_EXISTS);
+  }
+  console.log('1111');
   const salt = generateSalt();
-
+  console.log('salt', salt);
   const _id = await Counter.incrementCount(type.increment.registerAccount);
 
   await Account.create({
@@ -142,9 +144,10 @@ async function verifyAccessToken(token = '') {
 
   const data = await jwt.verify(accessToken, JWT_SECRET_KEY);
   const { userId } = data;
-  const user = await User.findById(userId);
+  const user = await UserModel.findById(userId);
   if (!user) throw new CustomError(errorCodes.UNAUTHORIZED);
-  if (user.status === type.accStatus.inactive)
+  const userData = user.toJSON();
+  if (userData.status === type.accStatus.inactive)
     throw new CustomError(errorCodes.BLOCK_USER);
   return { data, user: user.toJSON() };
 }
@@ -155,20 +158,20 @@ async function changePassword(
   newPassword,
   isManager = false,
 ) {
-  const user = await User.findById(userId);
-  if (!user) throw CustomError(errorCodes.USER_NOT_FOUND);
-
-  let { salt } = user;
+  const user = await UserModel.findById(userId);
+  if (!user) throw new CustomError(errorCodes.USER_NOT_FOUND);
+  const userData = user.toJSON();
+  let { salt } = userData;
   const isCorrectPassword = await compareBcrypt(
     hashSHA512(password),
-    decrypt(user.password),
+    decrypt(userData.password),
   );
   if (!isCorrectPassword && !isManager)
     throw new CustomError(errorCodes.DIFFERENT_PASSWORD);
   if (!salt) {
     salt = generateSalt();
   }
-  await User.findByIdAndUpdate(userId, {
+  await UserModel.findByIdAndUpdate(userId, {
     password: await encryptPassword(newPassword, salt),
     salt,
   });
@@ -179,7 +182,7 @@ async function resetPassword(body, isManager = false) {
   if (!isManager) throw new CustomError(errorCodes.BAD_REQUEST);
   return changePassword(body.userId, '', body.newPassword, isManager);
 }
-module.exports = {
+export {
   register,
   login,
   logout,

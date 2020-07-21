@@ -94,8 +94,4 @@ function getValidateResult(req, res, next) {
   next();
 }
 
-module.exports = {
-  apiTypes,
-  validate,
-  getValidateResult,
-};
+export { apiTypes, validate, getValidateResult };

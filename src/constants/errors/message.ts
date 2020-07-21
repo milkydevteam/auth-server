@@ -1,7 +1,7 @@
-const codes = require('./code');
-const { t } = require('../language');
+import codes from './code';
+import { t } from '../language';
 
-function getErrorMessage(code) {
+function getErrorMessage(code: number) {
   switch (code) {
     case codes.USER_ALREADY_EXISTS:
       return t('USER_ALREADY_EXISTS');
@@ -24,4 +24,4 @@ function getErrorMessage(code) {
   }
 }
 
-module.exports = getErrorMessage;
+export default getErrorMessage;

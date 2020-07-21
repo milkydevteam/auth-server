@@ -49,4 +49,4 @@ function snakecaseRes() {
   });
 }
 
-module.exports = snakecaseRes;
+export default snakecaseRes;

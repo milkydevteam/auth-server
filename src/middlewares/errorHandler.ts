@@ -1,11 +1,10 @@
-const snakecaseKeys = require('snakecase-keys');
-const codes = require('../constants/errors/code');
-const getErrorMessage = require('../constants/errors/message');
+import * as snakecaseKeys from 'snakecase-keys';
+import codes from '../constants/errors/code';
+import getErrorMessage from '../constants/errors/message';
 
 // eslint-disable-next-line no-unused-vars
-function errorHandler(err, req, res, next) {
+export default function errorHandler(err, req, res, next) {
   let statusCode = err.code;
-  console.log(err);
   let { message } = err;
   const code = err.code || codes.INTERNAL_SERVER_ERROR;
   switch (code) {
@@ -47,5 +46,3 @@ function errorHandler(err, req, res, next) {
     ),
   );
 }
-
-module.exports = errorHandler;

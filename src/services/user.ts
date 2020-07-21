@@ -1,10 +1,10 @@
-const CustomError = require('../constants/errors/CustomError');
-const errorCodes = require('../constants/errors/code');
-const User = require('../models/user');
+import CustomError from '../constants/errors/CustomError';
+import errorCodes from '../constants/errors/code';
+import UserModel from '../models/user';
 
 async function createUser(_id, data) {
   const { name, address, phone, userName } = data;
-  await User.create({
+  await UserModel.create({
     _id,
     name,
     address,
@@ -15,7 +15,7 @@ async function createUser(_id, data) {
 
 async function updateUserInfo(userId, data) {
   const { name, address, phone } = data;
-  const user = await User.findById(userId);
+  const user: any = await UserModel.findById(userId);
   if (!user) throw new CustomError(errorCodes.USER_NOT_FOUND);
   user.address = address;
   user.phone = phone;
@@ -24,14 +24,14 @@ async function updateUserInfo(userId, data) {
 }
 
 async function getUserById(userId) {
-  const user = await User.findById(userId);
+  const user = await UserModel.findById(userId);
   if (!user) throw new CustomError(errorCodes.USER_NOT_FOUND);
   return user.toJSON();
 }
 
 async function findAll(condition, project) {
   try {
-    const query = User.find(condition, project);
+    const query = UserModel.find(condition, project);
     let data = [];
     if (project.limit && project.page) {
       const limitNumber = Number.parseInt(project.limit, 10);
@@ -49,9 +49,8 @@ async function findAll(condition, project) {
   }
 }
 
-module.exports = {
-  createUser,
-  updateUserInfo,
-  getUserById,
-  findAll,
-};
+export async function blockUser(userId: number, block: any) {
+  // TODO
+}
+
+export { createUser, updateUserInfo, getUserById, findAll };

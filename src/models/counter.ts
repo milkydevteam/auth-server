@@ -31,4 +31,4 @@ counterSchema.statics.incrementCount = async function(counter) {
 
 const counter = mongoose.model('Counter', counterSchema);
 
-module.exports = counter;
+export default counter;

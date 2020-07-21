@@ -79,7 +79,15 @@ async function getPermissionsByRole(roleId) {
   return permissions.map(permission => permission.frontendKey);
 }
 
-module.exports = {
+export const findAll = (condition: any) => {
+  // TODO
+  return {
+    permissions: [],
+    count: 1,
+  };
+};
+
+export {
   isValidPermissions,
   addPermission,
   updatePermission,

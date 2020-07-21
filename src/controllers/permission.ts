@@ -1,6 +1,6 @@
-const permissionService = require('../services/permission');
+import * as permissionService from '../services/permission';
 
-async function addPermission(req, res) {
+export async function addPermission(req, res) {
   const {
     name,
     backendKey: { method, routePath },
@@ -14,7 +14,7 @@ async function addPermission(req, res) {
   return res.send({ status: 1, result: role });
 }
 
-async function updatePermission(req, res) {
+export async function updatePermission(req, res) {
   const { permissionId } = req.params;
   const updateFields = req.body;
   const updatedPermission = await permissionService.updatePermission(
@@ -24,9 +24,9 @@ async function updatePermission(req, res) {
   return res.send({ status: 1, result: updatedPermission });
 }
 
-async function getPermissions(req, res) {
+export async function getPermissions(req, res) {
   const { search, fields, offset, limit, sort } = req.query;
-  const query = {};
+  const query: any = {};
   query.query = {};
   if (search) query.search = search;
   if (fields) query.fields = fields.split(',');
@@ -35,9 +35,9 @@ async function getPermissions(req, res) {
   if (sort) query.sort = sort.split(',');
   Object.keys(req.query)
     .filter(
-      (q) => ['search', 'fields', 'offset', 'limit', 'sort'].indexOf(q) === -1,
+      q => ['search', 'fields', 'offset', 'limit', 'sort'].indexOf(q) === -1,
     )
-    .forEach((q) => {
+    .forEach(q => {
       query.query[q] = ['true', 'false'].includes(req.query[q])
         ? JSON.parse(req.query[q])
         : req.query[q];
@@ -50,15 +50,8 @@ async function getPermissions(req, res) {
   });
 }
 
-async function getPermissionsByRole(req, res) {
+export async function getPermissionsByRole(req, res) {
   const { roleId } = req.account;
   const permissions = await permissionService.getPermissionsByRole(roleId);
   return res.send({ status: 1, result: permissions });
 }
-
-module.exports = {
-  addPermission,
-  updatePermission,
-  getPermissions,
-  getPermissionsByRole,
-};

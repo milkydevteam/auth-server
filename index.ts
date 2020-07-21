@@ -5,13 +5,12 @@ const bodyParser = require('body-parser');
 // const expressValidator = require('express-validator');
 const morgan = require('morgan');
 const cors = require('cors');
-const errorHandler = require('./src/middlewares/errorHandler');
-const camelcaseRequest = require('./src/middlewares/camelCaseReq');
-const snakecaseResponse = require('./src/middlewares/snakeCaseRes');
+import errorHandler from './src/middlewares/errorHandler';
+import camelcaseRequest from './src/middlewares/camelCaseReq';
+import snakecaseResponse from './src/middlewares/snakeCaseRes';
 
-// import route
-const authRoutes = require('./src/routes/authRoute');
-const userRoutes = require('./src/routes/userRoutes');
+import authRoutes from './src/routes/authRoute';
+import userRoutes from './src/routes/userRoutes';
 
 require('./src/models');
 
@@ -24,7 +23,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 // app.use(expressValidator());
 app.use(camelcaseRequest);
-app.disable('x-powered-by');
 app.use(snakecaseResponse());
 
 app.use('/', authRoutes);
