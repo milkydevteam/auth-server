@@ -30,6 +30,13 @@
     "multer": "1.4.2",
     "redis": "2.8.0",
     "request": "2.88.0",
+    "@babel/cli": "^7.4.4",
+    "babel-preset-env": "^1.7.0",
+    "@babel/core": "^7.6.2",
+    "@babel/preset-env": "^7.10.4",
+    "@babel/register": "^7.10.5",
+    "@babel/runtime": "^7.6.2",
+    "babel-cli": "^6.26.0",
     "snakecase-keys": "3.1.0"
   },
   "devDependencies": {
