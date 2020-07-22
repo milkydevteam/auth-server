@@ -40,6 +40,7 @@ export async function logout(req, res) {
 
 export async function verifyAccessToken(req, res) {
   const { accessToken } = req;
+  console.log('accessToken', accessToken);
   if (accessToken) {
     const { user } = await authService.verifyAccessToken(accessToken);
     if (user) {

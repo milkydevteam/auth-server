@@ -1,7 +1,4 @@
 require('dotenv').config();
-require('babel-register')({
-  presets: ['es2015'],
-});
 const express = require('express');
 const compression = require('compression');
 const bodyParser = require('body-parser');
@@ -15,7 +12,7 @@ import snakecaseResponse from './middlewares/snakeCaseRes';
 import authRoutes from './routes/authRoute';
 import userRoutes from './routes/userRoutes';
 
-require('./src/models');
+require('./models');
 
 const app = express();
 
