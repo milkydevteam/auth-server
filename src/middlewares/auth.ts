@@ -1,7 +1,7 @@
 import asyncMiddleware from './async';
 import * as authService from '../services/auth';
-const CustomError = require('../constants/errors/CustomError');
-const codes = require('../constants/errors/code');
+import CustomError from '../constants/errors/CustomError';
+import codes from '../constants/errors/code';
 
 async function auth(req, res, next) {
   const { authorization } = req.headers;
