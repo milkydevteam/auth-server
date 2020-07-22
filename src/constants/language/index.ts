@@ -20,6 +20,6 @@ export const t = (key = ''): string => {
     case langKey.VI:
       return vi[k] || key;
     default:
-      return key;
+      return en[k] || key;
   }
 };
