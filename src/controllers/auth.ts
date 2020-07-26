@@ -1,7 +1,7 @@
 import * as authService from '../services/auth';
-import code from '../constants/errors/code';
 import CustomError from '../constants/errors/CustomError';
 import { Request, Response } from 'express';
+import { MyRequest } from '../constants/type';
 
 export async function login(req, res) {
   try {
@@ -13,16 +13,30 @@ export async function login(req, res) {
   }
 }
 
+export async function refreshToken(req: MyRequest, res: Response) {
+  try {
+    const { user } = req;
+    const accessToken = await authService.refreshToken({
+      userId: user.userId,
+      name: user.name,
+      // roles: user.roles,
+    });
+    res.send({ status: 1, result: { accessToken } });
+  } catch (error) {
+    res.send({ status: 0, message: error.message });
+  }
+}
+
 export const register = async (req: Request, res: Response) => {
   if (!req.body) {
-    throw new CustomError(code.REGISTER_INCLUDE);
+    throw new CustomError('REGISTER_INCLUDE');
   }
   const isExist = ['email', 'userName', 'password', 'name'].every(param => {
     return Object.keys(req.body).includes(param);
   });
 
   if (!isExist) {
-    throw new CustomError(code.REGISTER_INCLUDE);
+    throw new CustomError('REGISTER_INCLUDE');
   }
 
   await authService.register(req.body);
@@ -38,29 +52,23 @@ export async function logout(req, res) {
   return res.send({ status: 1 });
 }
 
-export async function verifyAccessToken(req, res) {
-  const { accessToken } = req;
-  console.log('accessToken', accessToken);
-  if (accessToken) {
-    const { user } = await authService.verifyAccessToken(accessToken);
-    if (user) {
-      return res.send({
-        status: 1,
-        result: {
-          user: {
-            name: user.name,
-            email: user.email,
-            id: user._id,
-            roles: user.roles,
-          },
+export async function verifyAccessToken(req: Request, res: Response) {
+  const { authorization } = req.headers;
+  const { user } = await authService.verifyAccessToken(authorization);
+  if (user) {
+    return res.send({
+      status: 1,
+      result: {
+        user: {
+          name: user.name,
+          email: user.email,
+          id: user._id,
+          roles: user.roles,
         },
-      });
-    }
+      },
+    });
   }
-  return res.send({
-    status: -1,
-    message: 'Unauthorized',
-  });
+  throw new CustomError('USER_NOT_FOUND');
 }
 
 export async function changePassword(req, res) {
