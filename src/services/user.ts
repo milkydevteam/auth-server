@@ -1,6 +1,6 @@
 import CustomError from '../constants/errors/CustomError';
-import errorCodes from '../constants/errors/code';
 import UserModel from '../models/user';
+import { UserType } from 'src/constants/type';
 
 async function createUser(_id, data) {
   const { name, address, phone, userName } = data;
@@ -16,7 +16,7 @@ async function createUser(_id, data) {
 async function updateUserInfo(userId, data) {
   const { name, address, phone } = data;
   const user: any = await UserModel.findById(userId);
-  if (!user) throw new CustomError(errorCodes.USER_NOT_FOUND);
+  if (!user) throw new CustomError('USER_NOT_FOUND');
   user.address = address;
   user.phone = phone;
   user.name = name;
@@ -24,9 +24,10 @@ async function updateUserInfo(userId, data) {
 }
 
 async function getUserById(userId) {
-  const user = await UserModel.findById(userId);
-  if (!user) throw new CustomError(errorCodes.USER_NOT_FOUND);
-  return user.toJSON();
+  const userDoc = await UserModel.findById(userId);
+  if (!userDoc) throw new CustomError('USER_NOT_FOUND');
+  const user: UserType = userDoc.toJSON();
+  return user;
 }
 
 async function findAll(condition, project) {
