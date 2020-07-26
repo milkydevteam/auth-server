@@ -2,7 +2,6 @@ import CustomError from '../constants/errors/CustomError';
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-import errorCodes from '../constants/errors/code';
 
 import UserModel from '../models/user';
 import Account from '../models/account';
@@ -89,11 +88,9 @@ async function register(data) {
     $or: [{ email }, { userName }],
   });
   if (isAccountExist) {
-    throw new CustomError(errorCodes.USER_ALREADY_EXISTS);
+    throw new CustomError('USER_ALREADY_EXISTS');
   }
-  console.log('1111');
   const salt = generateSalt();
-  console.log('salt', salt);
   const _id = await Counter.incrementCount(type.increment.registerAccount);
 
   await Account.create({
@@ -109,18 +106,25 @@ async function register(data) {
 
 async function login(userName, password) {
   const account = await Account.findOne({ userName });
-  if (!account) throw new CustomError(errorCodes.ACCOUNT_NOT_FOUND);
+  if (!account) throw new CustomError('ACCOUNT_NOT_FOUND');
   if (account.status === type.accStatus.inactive)
-    throw new CustomError(errorCodes.BLOCK_USER);
-  const { _id: userId } = account;
+    throw new CustomError('BLOCK_USER');
   const isCorrectPassword = await compareBcrypt(
     hashSHA512(password),
     decrypt(account.password),
   );
-  if (!isCorrectPassword) throw new CustomError(errorCodes.ACCOUNT_NOT_FOUND);
+  if (!isCorrectPassword) throw new CustomError('ACCOUNT_NOT_FOUND');
+  const { _id: userId } = account;
   const user = await UserService.getUserById(userId);
   const accessToken = await generateAccessToken({ userId, name: user.name });
   return accessToken;
+}
+export async function refreshToken(userData: {
+  userId: number;
+  name: string;
+  roles?: any;
+}) {
+  return generateAccessToken(userData);
 }
 
 async function logout(accessToken) {
@@ -141,15 +145,15 @@ async function verifyAccessToken(token = '') {
   //   const sessionInDb = await Session.findOne({ accessToken });
   //   if (!sessionInDb) throw new CustomError(errorCodes.UNAUTHORIZED);
   // }
-
   const data = await jwt.verify(accessToken, JWT_SECRET_KEY);
   const { userId } = data;
   const user = await UserModel.findById(userId);
-  if (!user) throw new CustomError(errorCodes.UNAUTHORIZED);
+  if (!user) throw new CustomError('UNAUTHORIZED');
   const userData = user.toJSON();
   if (userData.status === type.accStatus.inactive)
-    throw new CustomError(errorCodes.BLOCK_USER);
-  return { data, user: user.toJSON() };
+    throw new CustomError('BLOCK_USER');
+  const userJson: type.UserType = user.toJSON();
+  return { data, user: userJson };
 }
 
 async function changePassword(
@@ -159,7 +163,7 @@ async function changePassword(
   isManager = false,
 ) {
   const user = await UserModel.findById(userId);
-  if (!user) throw new CustomError(errorCodes.USER_NOT_FOUND);
+  if (!user) throw new CustomError('USER_NOT_FOUND');
   const userData = user.toJSON();
   let { salt } = userData;
   const isCorrectPassword = await compareBcrypt(
@@ -167,7 +171,7 @@ async function changePassword(
     decrypt(userData.password),
   );
   if (!isCorrectPassword && !isManager)
-    throw new CustomError(errorCodes.DIFFERENT_PASSWORD);
+    throw new CustomError('DIFFERENT_PASSWORD');
   if (!salt) {
     salt = generateSalt();
   }
@@ -179,7 +183,7 @@ async function changePassword(
 }
 
 async function resetPassword(body, isManager = false) {
-  if (!isManager) throw new CustomError(errorCodes.BAD_REQUEST);
+  if (!isManager) throw new CustomError('BAD_REQUEST');
   return changePassword(body.userId, '', body.newPassword, isManager);
 }
 export {

@@ -1,5 +1,4 @@
 import * as userService from '../services/user';
-import code from '../constants/errors/code';
 import CustomError from '../constants/errors/CustomError';
 
 export async function getOwnerProfile(req, res) {
@@ -37,10 +36,10 @@ export async function getUsers(req, res) {
 }
 
 export async function update(req, res) {
-  if (!req.user) throw new CustomError(code.NOT_ACCESSED);
+  if (!req.user) throw new CustomError('NOT_ACCESSED');
   const { userId: reqId } = req.user;
   const { userId } = req.params;
-  if (userId !== reqId) throw new CustomError(code.NOT_ACCESSED);
+  if (userId !== reqId) throw new CustomError('NOT_ACCESSED');
   const rs = await userService.updateUserInfo(userId, req.body);
   return res.send(rs);
 }
