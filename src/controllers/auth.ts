@@ -6,6 +6,7 @@ import { MyRequest } from '../constants/type';
 export async function login(req, res) {
   try {
     const { userName, password } = req.body;
+    console.log('req.body', req.body);
     const accessToken = await authService.login(userName, password);
     res.send({ status: 1, result: { accessToken } });
   } catch (error) {

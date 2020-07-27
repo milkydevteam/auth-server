@@ -1,5 +1,5 @@
 {
-  "REGISTER_INCLUDE": "Đăng ký phải bao gồm: email, userName, password, name",
+  "REGISTER_INCLUDE": "Đăng ký phải bao gồm: email, user_name, password, name",
   "USER_ALREADY_EXISTS": "Tài khoản đã tồn tại",
   "NOT_ACCESSED": "Bạn không có quyền truy cập",
   "NOT_FOUND_EMAIL": "Không tìm thấy email hợp lệ",

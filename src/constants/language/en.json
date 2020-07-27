@@ -1,5 +1,5 @@
 {
-  "REGISTER_INCLUDE": "You must include email, userName, password, name",
+  "REGISTER_INCLUDE": "You must include email, user_name, password, name",
   "USER_ALREADY_EXISTS": "User already exist",
   "NOT_ACCESSED": "You do not have access",
   "NOT_FOUND_EMAIL": "Email not invalid",
