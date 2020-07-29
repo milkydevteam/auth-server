@@ -6,7 +6,7 @@ export default class CustomError extends Error {
     if (Error.captureStackTrace) {
       Error.captureStackTrace(this, CustomError);
     }
-    this.code = codeObj[code];
+    this.code = codeObj[code] || 500;
     this.message = messages(this.code);
   }
   code: number;

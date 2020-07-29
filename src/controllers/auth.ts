@@ -4,28 +4,19 @@ import { Request, Response } from 'express';
 import { MyRequest } from '../constants/type';
 
 export async function login(req, res) {
-  try {
-    const { userName, password } = req.body;
-    console.log('req.body', req.body);
-    const accessToken = await authService.login(userName, password);
-    res.send({ status: 1, result: { accessToken } });
-  } catch (error) {
-    res.send({ status: 0, message: error.message });
-  }
+  const { userName, password } = req.body;
+  const accessToken = await authService.login(userName, password);
+  res.send({ status: 1, result: { accessToken } });
 }
 
 export async function refreshToken(req: MyRequest, res: Response) {
-  try {
-    const { user } = req;
-    const accessToken = await authService.refreshToken({
-      userId: user.userId,
-      name: user.name,
-      // roles: user.roles,
-    });
-    res.send({ status: 1, result: { accessToken } });
-  } catch (error) {
-    res.send({ status: 0, message: error.message });
-  }
+  const { user } = req;
+  const accessToken = await authService.refreshToken({
+    userId: user.userId,
+    name: user.name,
+    // roles: user.roles,
+  });
+  res.send({ status: 1, result: { accessToken } });
 }
 
 export const register = async (req: Request, res: Response) => {
