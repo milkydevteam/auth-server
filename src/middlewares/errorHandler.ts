@@ -33,7 +33,7 @@ export default function errorHandler(err, req, res, next) {
         statusCode = 200;
     }
   }
-  return res.status(500).send(
+  return res.status(code < 500 ? 500 : 400).send(
     snakecaseKeys(
       code
         ? {
