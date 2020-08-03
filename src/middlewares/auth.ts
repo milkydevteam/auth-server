@@ -10,8 +10,6 @@ async function auth(req, res, next) {
   const [tokenType, accessToken] = authorization.split(' ');
   if (tokenType !== 'Bearer') throw new Error();
   const { user } = await authService.verifyAccessToken(accessToken);
-  const test = await parseJwt(accessToken);
-  console.log('test token', test);
   if (user) {
     req.user = {
       userId: user._id,

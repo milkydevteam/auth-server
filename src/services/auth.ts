@@ -117,7 +117,7 @@ async function login(userName, password) {
   const { _id: userId } = account;
   const user = await UserService.getUserById(userId);
   const accessToken = await generateAccessToken({ userId, name: user.name });
-  return accessToken;
+  return { user, accessToken };
 }
 export async function refreshToken(userData: {
   userId: number;
@@ -132,6 +132,7 @@ async function logout(accessToken) {
 }
 
 async function verifyAccessToken(token = '') {
+  console.log('verifyAccessToken', token);
   const tokenSplit = token.split(' ');
   let accessToken = '';
   if (tokenSplit.length === 1) {
@@ -146,6 +147,7 @@ async function verifyAccessToken(token = '') {
   //   if (!sessionInDb) throw new CustomError(errorCodes.UNAUTHORIZED);
   // }
   const data = await jwt.verify(accessToken, JWT_SECRET_KEY);
+  console.log('verifyAccessToken + data', data);
   const { userId } = data;
   const user = await UserModel.findById(userId);
   if (!user) throw new CustomError('UNAUTHORIZED');

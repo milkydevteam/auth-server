@@ -5,8 +5,8 @@ import { MyRequest } from '../constants/type';
 
 export async function login(req, res) {
   const { userName, password } = req.body;
-  const accessToken = await authService.login(userName, password);
-  res.send({ status: 1, result: { accessToken } });
+  const { user, accessToken } = await authService.login(userName, password);
+  res.send({ status: 1, result: { accessToken, user } });
 }
 
 export async function refreshToken(req: MyRequest, res: Response) {
