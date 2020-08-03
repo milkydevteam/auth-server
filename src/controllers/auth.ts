@@ -51,12 +51,7 @@ export async function verifyAccessToken(req: Request, res: Response) {
     return res.send({
       status: 1,
       result: {
-        user: {
-          name: user.name,
-          email: user.email,
-          id: user._id,
-          roles: user.roles,
-        },
+        success: 1,
       },
     });
   }
