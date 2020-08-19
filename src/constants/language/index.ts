@@ -8,7 +8,7 @@ export const langKey = {
 
 export type LANG_KEY = 'vi' | 'en';
 
-let currentCode = langKey.EN;
+let currentCode = langKey.VI;
 export const getCurrentLangCode = () => currentCode;
 export const setLang = (l: LANG_KEY) => (currentCode = l);
 export const t = (key = ''): string => {

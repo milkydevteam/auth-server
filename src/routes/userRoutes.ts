@@ -5,6 +5,7 @@ import asyncMiddleware from '../middlewares/async';
 const router = Router();
 
 router.get('/me', auth, asyncMiddleware(userController.getOwnerProfile));
+router.post('/create', asyncMiddleware(userController.createAccount));
 router.get(
   '/profile/:userId',
   auth,

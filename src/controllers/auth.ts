@@ -2,6 +2,39 @@ import * as authService from '../services/auth';
 import CustomError from '../constants/errors/CustomError';
 import { Request, Response } from 'express';
 import { MyRequest } from '../constants/type';
+import { validatePassword } from '../utils/validate';
+import { checkAuthField } from '../utils/check';
+import { defaultPwd } from '../constants/serverDefault';
+export async function createAccount(data) {
+  checkAuthField(data, 'create');
+  let {
+    password,
+    confirmPassword,
+    roles,
+    userId,
+    passwordMaxRetrieve,
+    useDefaultPwd,
+    realDate,
+    roleCode,
+  } = data;
+
+  if (useDefaultPwd) {
+    password = defaultPwd;
+  } else {
+    if (!validatePassword(password)) throw new CustomError('BAD_REQUEST');
+    if (password !== confirmPassword) throw new CustomError('BAD_REQUEST');
+  }
+  if (roleCode) {
+    // TODO
+  }
+  await authService.createAccount({
+    password,
+    roles,
+    userId,
+    passwordMaxRetrieve,
+    realDate,
+  });
+}
 
 export async function login(req, res) {
   const { userName, password } = req.body;

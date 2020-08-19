@@ -6,5 +6,6 @@
   "DIFFERENT_PASSWORD": "Mật khẩu không đúng",
   "USER_NOT_FOUND": "Không tìm thấy người dùng",
   "BLOCK_USER": "Tài khoản đã bị khóa",
-  "ACCOUNT_NOT_FOUND": "Tài khoản hoặc mật khẩu không đúng"
+  "ACCOUNT_NOT_FOUND": "Tài khoản hoặc mật khẩu không đúng",
+  "NOT_FULL_INFO": "Bạn cần điền đầy đủ thông tin"
 }

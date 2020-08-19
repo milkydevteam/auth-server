@@ -13,6 +13,7 @@ export type codeType =
   | 'NOT_FOUND'
   | 'BLOCK_USER'
   | 'ACCOUNT_NOT_FOUND'
+  | 'NOT_FULL_INFO'
   | 'REGISTER_INCLUDE';
 
 const code = {

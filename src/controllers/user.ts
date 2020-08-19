@@ -1,5 +1,56 @@
 import * as userService from '../services/user';
+import * as accountService from '../services/auth';
 import CustomError from '../constants/errors/CustomError';
+
+const checkField = (data, type: 'create') => {
+  let exist;
+  if (type === 'create') {
+    exist = [
+      'userId',
+      'firstName',
+      'midName',
+      'lastName',
+      'address',
+      'email',
+      'branchId',
+    ].every(param => {
+      return Object.keys(data).includes(param);
+    });
+  }
+  if (!exist) throw new CustomError('NOT_FULL_INFO');
+};
+
+export async function createAccount(req, res) {
+  checkField(req.body, 'create');
+
+  const {
+    firstName,
+    midName,
+    lastName,
+    address,
+    email,
+    branchId,
+    password,
+  } = req.body;
+  const mergeName = `${firstName} ${midName}`;
+  const split = mergeName.split(' ');
+  let userId = lastName;
+  split.forEach(i => (userId += i[0].toLocaleLowerCase()));
+  const countUserId = await userService.findAllUserById(userId);
+  if (countUserId.length !== 0) {
+    userId += countUserId.length - 1;
+  }
+  await userService.createUser({
+    userId,
+    firstName,
+    midName,
+    lastName,
+    address,
+    email,
+    branchId,
+  });
+  res.send({ status: 1 });
+}
 
 export async function getOwnerProfile(req, res) {
   try {

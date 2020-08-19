@@ -82,6 +82,10 @@ async function registerWithSocial(data) {
   // TODO
 }
 
+export async function createAccount(data) {
+  // TODO
+}
+
 async function register(data) {
   const { email, password, userName } = data;
   const isAccountExist = await Account.findOne({
@@ -101,7 +105,7 @@ async function register(data) {
     salt,
     type: type.accType.system,
   });
-  await UserService.createUser(_id, data);
+  // await UserService.createUser(_id, data);
 }
 
 async function login(userName, password) {

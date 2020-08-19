@@ -1,16 +1,29 @@
 import CustomError from '../constants/errors/CustomError';
 import UserModel from '../models/user';
 import { UserType } from 'src/constants/type';
+import oracleConnect from '../models';
 
-async function createUser(_id, data) {
-  const { name, address, phone, userName } = data;
-  await UserModel.create({
-    _id,
-    name,
-    address,
-    phone,
-    url: userName,
-  });
+export async function findAllUserById(userId: string) {
+  const rs = await oracleConnect.excuteQuery(
+    `select * from CMS_USER where USER_ID like '%${userId}%'`,
+  );
+  return rs;
+}
+
+async function createUser({
+  userId,
+  firstName,
+  midName,
+  lastName,
+  address,
+  email,
+  branchId,
+}) {
+  return oracleConnect.excuteQuery(
+    `insert into CMS_USER (USER_ID, FIRST_NAME, MIDDLE_NAME, LAST_NAME, ADDRESS, EMAIL, BRANCH_ID)
+     values 
+     ('${userId}', '${firstName}', '${midName}', '${lastName}', '${address}', '${email}', '${branchId}')`,
+  );
 }
 
 async function updateUserInfo(userId, data) {
