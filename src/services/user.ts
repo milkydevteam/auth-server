@@ -23,6 +23,7 @@ async function createUser({
     `insert into CMS_USER (USER_ID, FIRST_NAME, MIDDLE_NAME, LAST_NAME, ADDRESS, EMAIL, BRANCH_ID)
      values 
      ('${userId}', '${firstName}', '${midName}', '${lastName}', '${address}', '${email}', '${branchId}')`,
+    false,
   );
 }
 

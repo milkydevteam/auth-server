@@ -1,12 +1,12 @@
 import * as userService from '../services/user';
-import * as accountService from '../services/auth';
+import * as authController from './auth';
 import CustomError from '../constants/errors/CustomError';
+import oracleConnect from '../models';
 
 const checkField = (data, type: 'create') => {
   let exist;
   if (type === 'create') {
     exist = [
-      'userId',
       'firstName',
       'midName',
       'lastName',
@@ -23,15 +23,7 @@ const checkField = (data, type: 'create') => {
 export async function createAccount(req, res) {
   checkField(req.body, 'create');
 
-  const {
-    firstName,
-    midName,
-    lastName,
-    address,
-    email,
-    branchId,
-    password,
-  } = req.body;
+  const { firstName, midName, lastName, address, email, branchId } = req.body;
   const mergeName = `${firstName} ${midName}`;
   const split = mergeName.split(' ');
   let userId = lastName;
@@ -40,15 +32,23 @@ export async function createAccount(req, res) {
   if (countUserId.length !== 0) {
     userId += countUserId.length - 1;
   }
-  await userService.createUser({
-    userId,
-    firstName,
-    midName,
-    lastName,
-    address,
-    email,
-    branchId,
-  });
+  try {
+    await userService.createUser({
+      userId,
+      firstName,
+      midName,
+      lastName,
+      address,
+      email,
+      branchId,
+    });
+    await authController.createAccount({ ...req.body, userId });
+    oracleConnect.conn.commit();
+  } catch (error) {
+    console.log('create user', error);
+    oracleConnect.conn.rollback();
+    throw new CustomError('INTERNAL_SERVER_ERROR');
+  }
   res.send({ status: 1 });
 }
 

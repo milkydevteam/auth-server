@@ -56,14 +56,14 @@ export class ConnectionDAO {
       });
   }
 
-  public excuteQuery(query: string): Promise<any[]> {
+  public excuteQuery(query: string, autoCommit = true): Promise<any[]> {
     return new Promise(async (resolve, reject) => {
       try {
         if (!this.conn) {
           await this.connProm;
         }
         console.log('query', query);
-        let result = await this.conn.execute(query);
+        let result = await this.conn.execute(query, [], { autoCommit });
         resolve(result.rows);
       } catch (err) {
         // catches errors in getConnection and the query

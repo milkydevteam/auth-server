@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 import { MyRequest } from '../constants/type';
 import { validatePassword } from '../utils/validate';
 import { checkAuthField } from '../utils/check';
-import { defaultPwd } from '../constants/serverDefault';
+import { defaultPwd } from '../constants/config';
 export async function createAccount(data) {
   checkAuthField(data, 'create');
   let {
@@ -16,16 +16,28 @@ export async function createAccount(data) {
     useDefaultPwd,
     realDate,
     roleCode,
+    activeDate,
   } = data;
 
   if (useDefaultPwd) {
     password = defaultPwd;
   } else {
-    if (!validatePassword(password)) throw new CustomError('BAD_REQUEST');
-    if (password !== confirmPassword) throw new CustomError('BAD_REQUEST');
+    if (!validatePassword(password))
+      throw new CustomError('BAD_REQUEST', {
+        message: 'The password is invalid',
+      });
+    if (password !== confirmPassword)
+      throw new CustomError('BAD_REQUEST', {
+        message: 'The confirm password is incorrect',
+      });
   }
   if (roleCode) {
     // TODO
+  } else {
+    if (!roles || roles.length === 0)
+      throw new CustomError('BAD_REQUEST', {
+        message: 'The roles of user is required',
+      });
   }
   await authService.createAccount({
     password,
@@ -33,6 +45,7 @@ export async function createAccount(data) {
     userId,
     passwordMaxRetrieve,
     realDate,
+    activeDate,
   });
 }
 

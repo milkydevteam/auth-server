@@ -8,6 +8,9 @@ export default class CustomError extends Error {
     }
     this.code = codeObj[code] || 400;
     this.message = messages(code);
+    if (params?.[0]?.message) {
+      this.message = params[0].message;
+    }
   }
   code: number;
 }

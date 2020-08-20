@@ -11,7 +11,8 @@ import Counter from '../models/counter';
 const { encrypt, decrypt } = require('../utils/security');
 // const Redis = require('../utils/redis');
 import * as type from '../constants/type';
-
+import oracleConnect from '../models';
+import * as moment from 'moment';
 const { JWT_SECRET_KEY, JWT_EXPIRES_TIME } = process.env;
 
 // async function createSession(userId, accessToken) {
@@ -83,6 +84,17 @@ async function registerWithSocial(data) {
 }
 
 export async function createAccount(data) {
+  const activeDate = moment(data.activeDate).format('DD/MM/YYYY');
+  const realDate = moment(data.realDate).format('DD/MM/YYYY');
+  return oracleConnect.excuteQuery(
+    `insert into CMS_ACCOUNT 
+      (USER_ID, PWD, PWD_MAX_RETRIEVE,
+        ROLES, REAL_DATE, CREATED_TIME, ACTIVE_DATE )
+     values 
+     ('${data.userId}', '${data.password}', ${data.passwordMaxRetrieve},
+     '${data.roles}', to_date('${realDate}', 'DD/MM/YYYY'), CURRENT_TIMESTAMP, to_date('${activeDate}', 'DD/MM/YYYY'))`,
+    false,
+  );
   // TODO
 }
 
