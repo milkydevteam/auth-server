@@ -2,46 +2,46 @@ import * as userService from '../services/user';
 import * as authController from './auth';
 import CustomError from '../constants/errors/CustomError';
 import oracleConnect from '../models';
-
-const checkField = (data, type: 'create') => {
-  let exist;
-  if (type === 'create') {
-    exist = [
-      'firstName',
-      'midName',
-      'lastName',
-      'address',
-      'email',
-      'branchId',
-    ].every(param => {
-      return Object.keys(data).includes(param);
-    });
-  }
-  if (!exist) throw new CustomError('NOT_FULL_INFO');
-};
+import UserModel from '../models/UserModel';
+import { checkUserField } from '../utils/check';
 
 export async function createAccount(req, res) {
-  checkField(req.body, 'create');
+  checkUserField(req.body, 'create');
 
-  const { firstName, midName, lastName, address, email, branchId } = req.body;
-  const mergeName = `${firstName} ${midName}`;
+  const {
+    firstName,
+    middleName,
+    lastName,
+    address,
+    email,
+    branchId,
+  } = req.body;
+  const mergeName = `${firstName.trim()} ${middleName.trim()}`;
   const split = mergeName.split(' ');
   let userId = lastName;
   split.forEach(i => (userId += i[0].toLocaleLowerCase()));
-  const countUserId = await userService.findAllUserById(userId);
-  if (countUserId.length !== 0) {
-    userId += countUserId.length - 1;
-  }
+
   try {
-    await userService.createUser({
-      userId,
-      firstName,
-      midName,
-      lastName,
-      address,
-      email,
-      branchId,
-    });
+    const countUserId = await new UserModel({}).find(
+      `USER_ID LIKE '%${userId}%'`,
+      ['*'],
+    );
+    if (countUserId.length !== 0) {
+      userId += countUserId.length - 1;
+    }
+    await new UserModel(
+      {
+        userId,
+        firstName,
+        middleName,
+        lastName,
+        address,
+        email,
+        branchId,
+      },
+      { autoCommit: false },
+    ).save();
+
     await authController.createAccount({ ...req.body, userId });
     oracleConnect.conn.commit();
   } catch (error) {
@@ -49,7 +49,7 @@ export async function createAccount(req, res) {
     oracleConnect.conn.rollback();
     throw new CustomError('INTERNAL_SERVER_ERROR');
   }
-  res.send({ status: 1 });
+  res.send({ status: 1, result: { data: userId } });
 }
 
 export async function getOwnerProfile(req, res) {

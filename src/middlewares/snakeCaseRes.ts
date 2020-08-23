@@ -10,8 +10,9 @@ function sortObject(obj) {
     }, {});
 }
 
-function transformObjectId(obj) {
+export function transformObjectId(obj) {
   if (typeof obj !== 'object') {
+    if (typeof obj === 'string') return obj.trim();
     return obj;
   }
 

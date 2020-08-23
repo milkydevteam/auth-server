@@ -16,3 +16,20 @@ export const checkAuthField = (data, type: 'create' | 'login') => {
   }
   if (!exist) throw new CustomError('NOT_FULL_INFO');
 };
+
+export const checkUserField = (data, type: 'create') => {
+  let exist;
+  if (type === 'create') {
+    exist = [
+      'firstName',
+      'middleName',
+      'lastName',
+      'address',
+      'email',
+      'branchId',
+    ].every(param => {
+      return Object.keys(data).includes(param);
+    });
+  }
+  if (!exist) throw new CustomError('NOT_FULL_INFO');
+};

@@ -3,9 +3,8 @@ const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-import UserModel from '../models/user';
+import User from '../models/user';
 import Account from '../models/account';
-import * as UserService from './user';
 import Counter from '../models/counter';
 // const Session = require('../models/session');
 const { encrypt, decrypt } = require('../utils/security');
@@ -13,6 +12,10 @@ const { encrypt, decrypt } = require('../utils/security');
 import * as type from '../constants/type';
 import oracleConnect from '../models';
 import * as moment from 'moment';
+import AccountModel from '../models/AccountModel';
+import UserModel from '../models/UserModel';
+import { accountStatus } from '../constants/config';
+
 const { JWT_SECRET_KEY, JWT_EXPIRES_TIME } = process.env;
 
 // async function createSession(userId, accessToken) {
@@ -34,7 +37,7 @@ async function generateAccessToken(data) {
   return accessToken;
 }
 
-function generateSalt() {
+export function generateSalt() {
   return bcrypt.genSaltSync(10);
 }
 
@@ -65,7 +68,8 @@ async function compareBcrypt(data, hashed) {
   return isCorrect;
 }
 
-async function encryptPassword(password, salt) {
+export async function encryptPassword(password) {
+  const salt = generateSalt();
   // Transform the plaintext password to hash value using SHA512
   const hashedSHA512 = hashSHA512(password);
   // Hash using bcrypt with a cost of 10 and unique, per-user salt
@@ -83,21 +87,6 @@ async function registerWithSocial(data) {
   // TODO
 }
 
-export async function createAccount(data) {
-  const activeDate = moment(data.activeDate).format('DD/MM/YYYY');
-  const realDate = moment(data.realDate).format('DD/MM/YYYY');
-  return oracleConnect.excuteQuery(
-    `insert into CMS_ACCOUNT 
-      (USER_ID, PWD, PWD_MAX_RETRIEVE,
-        ROLES, REAL_DATE, CREATED_TIME, ACTIVE_DATE )
-     values 
-     ('${data.userId}', '${data.password}', ${data.passwordMaxRetrieve},
-     '${data.roles}', to_date('${realDate}', 'DD/MM/YYYY'), CURRENT_TIMESTAMP, to_date('${activeDate}', 'DD/MM/YYYY'))`,
-    false,
-  );
-  // TODO
-}
-
 async function register(data) {
   const { email, password, userName } = data;
   const isAccountExist = await Account.findOne({
@@ -106,35 +95,41 @@ async function register(data) {
   if (isAccountExist) {
     throw new CustomError('USER_ALREADY_EXISTS');
   }
-  const salt = generateSalt();
+
   const _id = await Counter.incrementCount(type.increment.registerAccount);
 
   await Account.create({
     _id,
     userName,
     email,
-    password: await encryptPassword(password, salt),
-    salt,
+    password: await encryptPassword(password),
     type: type.accType.system,
   });
   // await UserService.createUser(_id, data);
 }
 
 async function login(userName, password) {
-  const account = await Account.findOne({ userName });
+  const account = await new AccountModel({ userId: userName }).findById();
   if (!account) throw new CustomError('ACCOUNT_NOT_FOUND');
-  if (account.status === type.accStatus.inactive)
+  if (account.ACCOUNT_STATUS === accountStatus.LOCKED_BY_ADMIN)
     throw new CustomError('BLOCK_USER');
   const isCorrectPassword = await compareBcrypt(
-    hashSHA512(password),
-    decrypt(account.password),
+    hashSHA512(password.trim()),
+    decrypt(account.PWD),
   );
   if (!isCorrectPassword) throw new CustomError('ACCOUNT_NOT_FOUND');
-  const { _id: userId } = account;
-  const user = await UserService.getUserById(userId);
-  const accessToken = await generateAccessToken({ userId, name: user.name });
+
+  const { USER_ID: userId } = account;
+  // const user = await UserService.getUserById({user_id});
+  const user = await new UserModel({ userId }).findById();
+
+  const accessToken = await generateAccessToken({
+    userId,
+    name: `${user.FIRST_NAME} ${user.MIDDLE_NAME} ${user.LAST_NAME}`,
+  });
   return { user, accessToken };
 }
+
 export async function refreshToken(userData: {
   userId: number;
   name: string;
@@ -165,7 +160,7 @@ async function verifyAccessToken(token = '') {
   const data = await jwt.verify(accessToken, JWT_SECRET_KEY);
   console.log('verifyAccessToken + data', data);
   const { userId } = data;
-  const user = await UserModel.findById(userId);
+  const user = await User.findById(userId);
   if (!user) throw new CustomError('UNAUTHORIZED');
   const userData = user.toJSON();
   if (userData.status === type.accStatus.inactive)
@@ -180,22 +175,18 @@ async function changePassword(
   newPassword,
   isManager = false,
 ) {
-  const user = await UserModel.findById(userId);
+  const user = await User.findById(userId);
   if (!user) throw new CustomError('USER_NOT_FOUND');
   const userData = user.toJSON();
-  let { salt } = userData;
   const isCorrectPassword = await compareBcrypt(
     hashSHA512(password),
     decrypt(userData.password),
   );
   if (!isCorrectPassword && !isManager)
     throw new CustomError('DIFFERENT_PASSWORD');
-  if (!salt) {
-    salt = generateSalt();
-  }
-  await UserModel.findByIdAndUpdate(userId, {
-    password: await encryptPassword(newPassword, salt),
-    salt,
+
+  await User.findByIdAndUpdate(userId, {
+    password: await encryptPassword(newPassword),
   });
   return { status: 1 };
 }

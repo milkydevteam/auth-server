@@ -1,53 +1,19 @@
-const mongoose = require('mongoose');
-const oracledb = require('oracledb');
-require('mongoose-long')(mongoose);
-
-const { MONGODB_URI } = process.env;
-
-mongoose.connect(MONGODB_URI, {
-  autoIndex: false,
-  useNewUrlParser: true,
-  useFindAndModify: false,
-});
-
-mongoose.connection.on('error', err => {
-  console.error(err);
-  process.exit();
-});
-
-mongoose.connection.once('open', () => {
-  console.log(`Connected to MongoDB: ${MONGODB_URI}`);
-});
 import * as OracleDB from 'oracledb';
-
+// @ts-ignore
+OracleDB.outFormat = OracleDB.OUT_FORMAT_OBJECT;
 export class ConnectionDAO {
-  /**
-   * Connection Variable Declaration
-   */
-  public conn: OracleDB.IConnection;
-  public connProm: OracleDB.IPromise<void>;
+  public conn: OracleDB.Connection;
+  public connProm;
 
-  /**
-   * Result Variable Declaration
-   */
-  result;
-
-  /**
-   *
-   * Creates an instance of CommercialDAO.
-   * To Initiate Connection and Make the connection utilized by @memberof CommercialDAO
-   * @memberof CommercialDAO
-   */
   constructor() {
-    oracledb.initOracleClient({ libDir: '/Users/milky/instantclient_19_3' });
+    OracleDB.initOracleClient({ libDir: '/Users/milky/instantclient_19_3' });
 
-    this.connProm = oracledb
-      .getConnection({
-        connectString: process.env.ORACLE_CONNECT,
-        user: process.env.ORACLE_USER,
-        password: process.env.ORACLE_PWD,
-      })
-      .then(async (connection: OracleDB.IConnection) => {
+    this.connProm = OracleDB.getConnection({
+      connectString: process.env.ORACLE_CONNECT,
+      user: process.env.ORACLE_USER,
+      password: process.env.ORACLE_PWD,
+    })
+      .then(async connection => {
         console.log('Connection finally created in constructor');
         this.conn = connection;
       })
@@ -56,6 +22,16 @@ export class ConnectionDAO {
       });
   }
 
+  public transaction(allQuery: Promise<any>[]) {
+    try {
+      Promise.all(allQuery).then(() => {
+        this.conn.commit();
+      });
+    } catch (error) {
+      console.log('transaction', error);
+      this.conn.rollback();
+    }
+  }
   public excuteQuery(query: string, autoCommit = true): Promise<any[]> {
     return new Promise(async (resolve, reject) => {
       try {

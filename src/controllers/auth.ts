@@ -5,6 +5,7 @@ import { MyRequest } from '../constants/type';
 import { validatePassword } from '../utils/validate';
 import { checkAuthField } from '../utils/check';
 import { defaultPwd } from '../constants/config';
+import AccountModel from '../models/AccountModel';
 export async function createAccount(data) {
   checkAuthField(data, 'create');
   let {
@@ -39,18 +40,22 @@ export async function createAccount(data) {
         message: 'The roles of user is required',
       });
   }
-  await authService.createAccount({
-    password,
-    roles,
-    userId,
-    passwordMaxRetrieve,
-    realDate,
-    activeDate,
-  });
+  await new AccountModel(
+    {
+      pwd: await authService.encryptPassword(password),
+      roles,
+      userId,
+      pwdMaxRetrieve: passwordMaxRetrieve,
+      realDate,
+      activeDate,
+    },
+    { autoCommit: false },
+  ).save();
 }
 
 export async function login(req, res) {
   const { userName, password } = req.body;
+  if (!userName || !password) throw new CustomError('NOT_FULL_INFO');
   const { user, accessToken } = await authService.login(userName, password);
   res.send({ status: 1, result: { accessToken, user } });
 }
