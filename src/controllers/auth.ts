@@ -97,12 +97,15 @@ export async function logout(req, res) {
 
 export async function verifyAccessToken(req: Request, res: Response) {
   const { authorization } = req.headers;
-  const { user } = await authService.verifyAccessToken(authorization);
-  if (user) {
+  const { data, accessToken } = await authService.verifyAccessToken(
+    authorization,
+  );
+  if (data) {
     return res.send({
       status: 1,
       result: {
-        success: 1,
+        user: data,
+        accessToken,
       },
     });
   }

@@ -9,12 +9,10 @@ async function auth(req, res, next) {
 
   const [tokenType, accessToken] = authorization.split(' ');
   if (tokenType !== 'Bearer') throw new Error();
-  const { user } = await authService.verifyAccessToken(accessToken);
-  if (user) {
+  const { data } = await authService.verifyAccessToken(accessToken, false);
+  if (data) {
     req.user = {
-      userId: user._id,
-      roles: user.roles,
-      ...user,
+      ...data,
     };
   }
   if (['/auths/logout', '/auths/verify'].includes(req.path)) {

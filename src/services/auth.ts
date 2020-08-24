@@ -142,7 +142,7 @@ async function logout(accessToken) {
   // await deleteSession(accessToken);
 }
 
-async function verifyAccessToken(token = '') {
+async function verifyAccessToken(token = '', requireRefresh = true) {
   console.log('verifyAccessToken', token);
   const tokenSplit = token.split(' ');
   let accessToken = '';
@@ -158,15 +158,20 @@ async function verifyAccessToken(token = '') {
   //   if (!sessionInDb) throw new CustomError(errorCodes.UNAUTHORIZED);
   // }
   const data = await jwt.verify(accessToken, JWT_SECRET_KEY);
-  console.log('verifyAccessToken + data', data);
   const { userId } = data;
-  const user = await User.findById(userId);
-  if (!user) throw new CustomError('UNAUTHORIZED');
-  const userData = user.toJSON();
-  if (userData.status === type.accStatus.inactive)
+  const acc = await new AccountModel({ userId }).findById();
+  if (!acc) throw new CustomError('UNAUTHORIZED');
+
+  if (acc.ACCOUNT_STATUS === accountStatus.LOCKED_BY_ADMIN)
     throw new CustomError('BLOCK_USER');
-  const userJson: type.UserType = user.toJSON();
-  return { data, user: userJson };
+  const newData = { ...data, roles: acc.ROLES };
+  delete newData.iat;
+  delete newData.exp;
+  if (!requireRefresh) {
+    return { data: newData };
+  }
+  const newToken = await generateAccessToken(newData);
+  return { data: newData, accessToken: newToken };
 }
 
 async function changePassword(
