@@ -5,7 +5,8 @@ import oracleConnect from '../models';
 import UserModel from '../models/UserModel';
 import { checkUserField } from '../utils/check';
 
-export async function createAccount(req, res) {
+
+export async function createUser(req, res) {
   checkUserField(req.body, 'create');
 
   const {
@@ -39,14 +40,10 @@ export async function createAccount(req, res) {
         email,
         branchId,
       },
-      { autoCommit: false },
     ).save();
 
-    await authController.createAccount({ ...req.body, userId });
-    oracleConnect.conn.commit();
   } catch (error) {
     console.log('create user', error);
-    oracleConnect.conn.rollback();
     throw new CustomError('INTERNAL_SERVER_ERROR');
   }
   res.send({ status: 1, result: { data: userId } });

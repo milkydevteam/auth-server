@@ -1,23 +1,25 @@
 import * as authService from '../services/auth';
+import * as userService from '../services/user';
 import CustomError from '../constants/errors/CustomError';
 import { Request, Response } from 'express';
 import { MyRequest } from '../constants/type';
 import { validatePassword } from '../utils/validate';
-import { checkAuthField } from '../utils/check';
+import { checkUserField, checkAuthField } from '../utils/check';
 import { defaultPwd } from '../constants/config';
-import AccountModel from '../models/AccountModel';
 export async function createAccount(data) {
   checkAuthField(data, 'create');
   let {
+    email,
     password,
     confirmPassword,
-    roles,
-    userId,
+    role,
+    userName,
     passwordMaxRetrieve,
     useDefaultPwd,
     realDate,
     roleCode,
     activeDate,
+    userId
   } = data;
 
   if (useDefaultPwd) {
@@ -35,22 +37,21 @@ export async function createAccount(data) {
   if (roleCode) {
     // TODO
   } else {
-    if (!roles || roles.length === 0)
+    if (!role || role.length === 0)
       throw new CustomError('BAD_REQUEST', {
-        message: 'The roles of user is required',
+        message: 'The role of user is required',
       });
   }
-  await new AccountModel(
-    {
-      pwd: await authService.encryptPassword(password),
-      roles,
-      userId,
-      pwdMaxRetrieve: passwordMaxRetrieve,
-      realDate,
-      activeDate,
-    },
-    { autoCommit: false },
-  ).save();
+  return await authService.register({
+    password,
+    role,
+    userId,
+    pwdMaxRetrieve: passwordMaxRetrieve,
+    realDate,
+    activeDate,
+    userName
+  })
+
 }
 
 export async function login(req, res) {
@@ -58,6 +59,41 @@ export async function login(req, res) {
   if (!userName || !password) throw new CustomError('NOT_FULL_INFO');
   const { user, accessToken } = await authService.login(userName, password);
   res.send({ status: 1, result: { accessToken, user } });
+}
+
+export const register = async (req: Request, res: Response) => {
+  if (!req.body) {
+    throw new CustomError('REGISTER_INCLUDE');
+  }
+  const {
+    email
+  } = req.body;
+  if(!email) {
+    throw new CustomError('BAD_REQUEST', {message: "Email is invalid"});
+  }
+
+  const splitEmail = email.split('@');
+  if(splitEmail.length !== 2) throw new CustomError('BAD_REQUEST', {message: 'Email is invalid'});
+
+  let userName = splitEmail[0];
+  const userId = await userService.createUserOnlyEmail(email);
+  if(!userId) {
+    throw new CustomError('INTERNAL_SERVER_ERROR', {message: "Don't create user success"});
+  }
+  await createAccount({...req.body, userName, userId});
+
+  res.send({ status: 1, data: {
+    userName
+  } });
+};
+
+export async function logout(req, res) {
+  const { accessToken } = req;
+  await authService.logout(accessToken);
+  req.accessToken = null;
+  req.user = null;
+  req.userId = null;
+  return res.send({ status: 1 });
 }
 
 export async function refreshToken(req: MyRequest, res: Response) {
@@ -68,31 +104,6 @@ export async function refreshToken(req: MyRequest, res: Response) {
     // roles: user.roles,
   });
   res.send({ status: 1, result: { accessToken } });
-}
-
-export const register = async (req: Request, res: Response) => {
-  if (!req.body) {
-    throw new CustomError('REGISTER_INCLUDE');
-  }
-  const isExist = ['email', 'userName', 'password', 'name'].every(param => {
-    return Object.keys(req.body).includes(param);
-  });
-
-  if (!isExist) {
-    throw new CustomError('REGISTER_INCLUDE');
-  }
-
-  await authService.register(req.body);
-  res.send({ status: 1 });
-};
-
-export async function logout(req, res) {
-  const { accessToken } = req;
-  await authService.logout(accessToken);
-  req.accessToken = null;
-  req.user = null;
-  req.userId = null;
-  return res.send({ status: 1 });
 }
 
 export async function verifyAccessToken(req: Request, res: Response) {

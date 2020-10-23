@@ -24,32 +24,38 @@ export default class ModelBase<T> {
     const tmp = snakecaseKeys(transformObjectId(_data), { deep: true });
     const after: any = {};
     Object.keys(tmp).forEach(key => {
+      if(!tmp[key]) return;
       after[key.toLocaleUpperCase()] = tmp[key];
     });
     this.data = after;
   };
-  public async insert() {
-    try {
-      const query = `
+  public async insert(moreQuery?: string, params?: any) {
+    const query = `
     insert into ${this.tableName} (${Object.keys(this.data)
-        .join(',')
-        .toLocaleUpperCase()})
+      .join(',')
+      .toLocaleUpperCase()})
     values 
     (${Object.keys(this.data)
       .map(
         key =>
-          `${
-            typeof this.data[key] === 'number'
+         {
+           let origin = false;
+           if(typeof this.data[key] === 'string' && this.data[key].indexOf('data:') === 0) {
+             origin = true;
+            this.data[key] = this.data[key].replace('data:', '');
+           }
+          return `${
+            typeof this.data[key] === 'number' || origin
               ? this.data[key]
               : `'${this.data[key]}'`
-          }`,
+          }`
+         },
       )
-      .join(',')})`;
-      return await this.connect.execute(query, [], { ...this.options });
-    } catch (error) {
-      console.log('excute error');
-      throw new Error(error);
-    }
+      .join(',')}) ${moreQuery || ''}`;
+      console.log(query)
+    return await this.connect.execute(query, params || [], {
+      ...this.options
+    });
   }
 
   public async execute(query: string) {

@@ -1,5 +1,5 @@
 import CustomError from '../constants/errors/CustomError';
-import UserModel from '../models/user';
+import UserModel from '../models/UserModel';
 import { UserType } from 'src/constants/type';
 import oracleConnect from '../models';
 
@@ -27,41 +27,20 @@ async function createUser({
   );
 }
 
+export async function createUserOnlyEmail(email) {
+  return await new UserModel({email}).save();
+}
+
 async function updateUserInfo(userId, data) {
-  const { name, address, phone } = data;
-  const user: any = await UserModel.findById(userId);
-  if (!user) throw new CustomError('USER_NOT_FOUND');
-  user.address = address;
-  user.phone = phone;
-  user.name = name;
-  await user.save();
+  // TODO
 }
 
 async function getUserById(userId) {
-  const userDoc = await UserModel.findById(userId);
-  if (!userDoc) throw new CustomError('USER_NOT_FOUND');
-  const user: UserType = userDoc.toJSON();
-  return user;
+  // TODO
 }
 
 async function findAll(condition, project) {
-  try {
-    const query = UserModel.find(condition, project);
-    let data = [];
-    if (project.limit && project.page) {
-      const limitNumber = Number.parseInt(project.limit, 10);
-      const pageNumber = Number.parseInt(project.page, 10);
-      data = await query
-        .skip(limitNumber * pageNumber)
-        .limit(limitNumber)
-        .exec();
-    } else {
-      data = await query.exec();
-    }
-    return data;
-  } catch (error) {
-    return error;
-  }
+  // TODO
 }
 
 export async function blockUser(userId: number, block: any) {

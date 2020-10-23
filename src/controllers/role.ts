@@ -1,8 +1,12 @@
+import CustomError from 'src/constants/errors/CustomError';
 import * as RoleService from '../services/role';
 
-async function addRole(req, res) {
-  const { name } = req.body;
-  const role = await RoleService.addRole(name);
+async function createRole(req, res) {
+  const { name, code, permissions } = req.body;
+  if(!name || !code || !permissions) {
+    throw new CustomError('NOT_FULL_INFO')
+  }
+  const role = await RoleService.addRole({name, code, permissions});
   return res.send({ status: 1, result: role });
 }
 
@@ -24,4 +28,4 @@ async function getRoles(req, res) {
   });
 }
 
-export { addRole, updateRole, getRoles };
+export { createRole, updateRole, getRoles };

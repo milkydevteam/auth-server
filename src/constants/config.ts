@@ -1,5 +1,5 @@
 export const defaultPwd = '123123aA@';
-
+export const pwdMaxRetrieve = 5;
 export const pwdStatus = {
   INITIAL: 1,
   NORMAL: 2,

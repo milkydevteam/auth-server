@@ -2,6 +2,7 @@ import ModelBase from './ModelBase';
 import CustomError from '../constants/errors/CustomError';
 import * as moment from 'moment';
 import oracleConnect from '.';
+import { pwdMaxRetrieve } from '../constants/config';
 
 interface AccountType {
   PWD?: string;
@@ -10,11 +11,13 @@ interface AccountType {
   PWD_MAX_RETRIEVE?: number;
   ACCOUNT_STATUS?: number;
   PWD_RETRIED?: number;
-  ROLES?: string;
+  ROLE?: string;
   USER_ID?: string;
-  REAL_DATE?: number;
-  ACTIVE_DATE?: number;
-  CREATED_TIME?: number;
+  REAL_DATE?: number | string;
+  ACTIVE_DATE?: number | string;
+  CREATED_TIME?: number | string;
+  EMAIL?: string;
+  USER_NAME?: string
 }
 
 interface AccountNotConvert {
@@ -24,11 +27,13 @@ interface AccountNotConvert {
   pwdMaxRetrieve?: number;
   accountStatus?: number;
   pwdTried?: number;
-  roles?: string;
+  role?: string;
   userId?: string;
   realDate?: number;
   activeDate?: number;
   createdTime?: number;
+  email?: string;
+  userName?: string;
 }
 
 export default class AccountModel extends ModelBase<AccountType> {
@@ -40,19 +45,16 @@ export default class AccountModel extends ModelBase<AccountType> {
     const { data } = this;
     const activeDate = moment(data.ACTIVE_DATE).format('DD/MM/YYYY');
     const realDate = moment(data.REAL_DATE).format('DD/MM/YYYY');
-    const query = `insert into ${this.tableName} 
-    (USER_ID, PWD, PWD_MAX_RETRIEVE,
-      ROLES, REAL_DATE, CREATED_TIME, ACTIVE_DATE )
-   values 
-   ('${data.USER_ID}', '${data.PWD}', ${data.PWD_MAX_RETRIEVE},
-   '${data.ROLES}', to_date('${realDate}', 'DD/MM/YYYY'), CURRENT_TIMESTAMP, to_date('${activeDate}', 'DD/MM/YYYY'))`;
-    return this.execute(query);
+    this.data.ACTIVE_DATE = `data:to_date('${activeDate}', 'DD/MM/YYYY')`;
+    this.data.CREATED_TIME = "data:CURRENT_TIMESTAMP";
+    this.data.REAL_DATE = `data:to_date('${realDate}', 'DD/MM/YYYY')`;
+    return this.insert();
   }
-  public async findById() {
+  public async findByUsername() {
     const query = `
       select * 
       from ${this.tableName}
-      where USER_ID = '${this.data.USER_ID}'
+      where USER_NAME = '${this.data.USER_NAME}'
     `;
     const rs = await this.execute(query);
     const _data: AccountType | undefined = rs.rows[0];

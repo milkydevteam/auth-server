@@ -87,29 +87,25 @@ async function registerWithSocial(data) {
   // TODO
 }
 
-async function register(data) {
-  const { email, password, userName } = data;
-  const isAccountExist = await Account.findOne({
-    $or: [{ email }, { userName }],
-  });
-  if (isAccountExist) {
-    throw new CustomError('USER_ALREADY_EXISTS');
-  }
+async function register(data: {
+  password: string,
+  userId: string,
+  pwdMaxRetrieve: number,
+  activeDate: number,
+  role: string,
+  userName: string,
+  realDate: number
+  }) {
+    const pwd = await encryptPassword(data.password);
+    delete data.password;
+    console.log(data);
+    return await new AccountModel({...data, pwd}).save();
+  // const _id = await Counter.incrementCount(type.increment.registerAccount);
 
-  const _id = await Counter.incrementCount(type.increment.registerAccount);
-
-  await Account.create({
-    _id,
-    userName,
-    email,
-    password: await encryptPassword(password),
-    type: type.accType.system,
-  });
-  // await UserService.createUser(_id, data);
 }
 
 async function login(userName, password) {
-  const account = await new AccountModel({ userId: userName }).findById();
+  const account = await new AccountModel({ userName }).findByUsername();
   if (!account) throw new CustomError('ACCOUNT_NOT_FOUND');
   if (account.ACCOUNT_STATUS === accountStatus.LOCKED_BY_ADMIN)
     throw new CustomError('BLOCK_USER');
@@ -158,13 +154,13 @@ async function verifyAccessToken(token = '', requireRefresh = true) {
   //   if (!sessionInDb) throw new CustomError(errorCodes.UNAUTHORIZED);
   // }
   const data = await jwt.verify(accessToken, JWT_SECRET_KEY);
-  const { userId } = data;
-  const acc = await new AccountModel({ userId }).findById();
+  const { userName } = data;
+  const acc = await new AccountModel({ userName }).findByUsername();
   if (!acc) throw new CustomError('UNAUTHORIZED');
 
   if (acc.ACCOUNT_STATUS === accountStatus.LOCKED_BY_ADMIN)
     throw new CustomError('BLOCK_USER');
-  const newData = { ...data, roles: acc.ROLES };
+  const newData = { ...data, roles: acc.ROLE };
   delete newData.iat;
   delete newData.exp;
   if (!requireRefresh) {

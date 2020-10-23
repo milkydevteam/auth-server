@@ -1,4 +1,7 @@
+import CustomError from '../constants/errors/CustomError';
+import errorHandler from '../middlewares/errorHandler';
 import ModelBase from './ModelBase';
+import * as OracleDB from 'oracledb';
 
 interface UserType {
   USER_ID?: string;
@@ -28,13 +31,26 @@ export default class UserModel extends ModelBase<UserType> {
     this.tableName = 'CMS_USER';
   }
   save = async () => {
-    this.insert();
-    // return this.connect.excuteQuery(
-    //   `insert into CMS_USER (USER_ID, FIRST_NAME, MIDDLE_NAME, LAST_NAME, ADDRESS, EMAIL, BRANCH_ID)
-    //    values
-    //    ('${data.user_id}', '${data.first_name}', '${data.middle_name}', '${data.last_name}', '${data.address}', '${data.email}', '${data.branch_id}')`,
-    //   false,
-    // );
+    try {
+      const params = {
+        user_id: {
+          type: OracleDB.NUMBER,
+          dir: OracleDB.BIND_OUT
+        }
+      }
+      const rs = await this.insert('returning USER_ID into :user_id', params);
+      let userId = 0;
+      const out: any = rs?.outBinds;
+      if(out) {
+        userId = out.user_id[0];
+      }
+      return userId;
+    } catch (error) {
+      if (error.message && error.message.includes('VCBAPP1.CMS_USER_UK1')) {
+        throw new CustomError('USER_ALREADY_EXISTS');
+      }
+      throw Error(error.message);
+    }
   };
   public async findById() {
     const query = `

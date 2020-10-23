@@ -5,7 +5,7 @@ export const updateRole = (roleId: number, fields: any) => {
   // TODO
 };
 
-export const addRole = (role: any) => {
+export const addRole = (data: {name: string, code: string, permissions: string}) => {
   // TODO
 };
 
