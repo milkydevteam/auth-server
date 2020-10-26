@@ -6,7 +6,7 @@ export class ConnectionDAO {
   public connProm;
 
   constructor() {
-    OracleDB.initOracleClient({ libDir: process.env.LIB_DIR });
+    OracleDB.initOracleClient({ libDir: process.env.LIB_DIR || process.env.DOCKER_LIB_DIR  });
 
     this.connProm = OracleDB.getConnection({
       connectString: process.env.ORACLE_CONNECT,
