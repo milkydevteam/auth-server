@@ -31,12 +31,12 @@ export async function createUserOnlyEmail(email) {
   return await new UserModel({email}).save();
 }
 
-async function updateUserInfo(userId, data) {
-  // TODO
+async function updateUserInfo(userId: number, data: {firstName?: string, middleName?:string, lastName?: string, address?: string}) {
+  return new UserModel(data).updateBasicInfor(userId)
 }
 
 async function getUserById(userId) {
-  // TODO
+  return await new UserModel({userId}).findById();
 }
 
 async function findAll(condition, project) {

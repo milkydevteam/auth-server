@@ -14,7 +14,7 @@ export class ConnectionDAO {
       password: process.env.ORACLE_PWD,
     })
       .then(async connection => {
-        console.log('Connection finally created in constructor');
+        console.log('Connection to database success');
         this.conn = connection;
       })
       .catch((err: any) => {

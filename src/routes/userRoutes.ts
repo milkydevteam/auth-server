@@ -6,6 +6,7 @@ const router = Router();
 
 router.get('/me', auth, asyncMiddleware(userController.getOwnerProfile));
 router.post('/create', asyncMiddleware(userController.createUser));
+router.post('/update/:userId',auth,asyncMiddleware(userController.update));
 router.get(
   '/profile/:userId',
   auth,

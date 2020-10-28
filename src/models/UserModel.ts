@@ -52,6 +52,14 @@ export default class UserModel extends ModelBase<UserType> {
       throw Error(error.message);
     }
   };
+  updateBasicInfor = async (userId: number) => {
+    const query = `
+      update ${this.tableName}
+      set ${Object.keys(this.data).map(key => `${key}='${this.data[key]}'`).join(', ')}
+      where user_id=${userId}
+      `;
+    await  this.execute(query);
+  }
   public async findById() {
     const query = `
       select * from ${this.tableName}

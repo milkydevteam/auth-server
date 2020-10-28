@@ -58,7 +58,7 @@ export default class ModelBase<T> {
     });
   }
 
-  public async execute(query: string) {
+  public async execute(query: string, params?: any) {
     try {
       if (!this.connect) {
         await oracleConnect.connProm;
@@ -66,7 +66,7 @@ export default class ModelBase<T> {
       }
       console.log('query: ', query, '\noptions: ', this.options);
 
-      const _data = await this.connect.execute(query, [], { ...this.options });
+      const _data = await this.connect.execute(query, params || [], { ...this.options });
       this.meta = _data.metaData;
       return _data;
     } catch (error) {

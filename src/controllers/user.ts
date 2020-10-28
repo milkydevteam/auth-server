@@ -86,10 +86,17 @@ export async function getUsers(req, res) {
 export async function update(req, res) {
   if (!req.user) throw new CustomError('NOT_ACCESSED');
   const { userId: reqId } = req.user;
-  const { userId } = req.params;
+  let { userId } = req.params;
+  userId = Number.parseInt(userId);
   if (userId !== reqId) throw new CustomError('NOT_ACCESSED');
-  const rs = await userService.updateUserInfo(userId, req.body);
-  return res.send(rs);
+  const {firstName, middleName, lastName, address} = req.body;
+   await userService.updateUserInfo(userId, {
+    firstName, middleName, lastName, address
+  });
+  return res.send({result: {
+    success: true,
+    message: "Update information success"
+  }});
 }
 
 export async function blockUser(req, res) {

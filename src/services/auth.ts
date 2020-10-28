@@ -105,7 +105,7 @@ async function register(data: {
 }
 
 async function login(userName, password) {
-  const account = await new AccountModel({ userName }).findByUsername();
+  const account = await new AccountModel({ userName }).findOneUser();
   if (!account) throw new CustomError('ACCOUNT_NOT_FOUND');
   if (account.ACCOUNT_STATUS === accountStatus.LOCKED_BY_ADMIN)
     throw new CustomError('BLOCK_USER');
@@ -154,8 +154,8 @@ async function verifyAccessToken(token = '', requireRefresh = true) {
   //   if (!sessionInDb) throw new CustomError(errorCodes.UNAUTHORIZED);
   // }
   const data = await jwt.verify(accessToken, JWT_SECRET_KEY);
-  const { userName } = data;
-  const acc = await new AccountModel({ userName }).findByUsername();
+  const { userId } = data;
+  const acc = await new AccountModel({ userId }).findOneUser(true);
   if (!acc) throw new CustomError('UNAUTHORIZED');
 
   if (acc.ACCOUNT_STATUS === accountStatus.LOCKED_BY_ADMIN)

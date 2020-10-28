@@ -50,11 +50,11 @@ export default class AccountModel extends ModelBase<AccountType> {
     this.data.REAL_DATE = `data:to_date('${realDate}', 'DD/MM/YYYY')`;
     return this.insert();
   }
-  public async findByUsername() {
+  public async findOneUser(withUserId = false) {
     const query = `
       select * 
       from ${this.tableName}
-      where USER_NAME = '${this.data.USER_NAME}'
+      where ${withUserId ? ` USER_ID = '${this.data.USER_ID}` : ` USER_NAME = '${this.data.USER_NAME}`}'
     `;
     const rs = await this.execute(query);
     const _data: AccountType | undefined = rs.rows[0];
