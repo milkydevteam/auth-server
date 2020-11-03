@@ -43,8 +43,8 @@ export default class AccountModel extends ModelBase<AccountType> {
   }
   public save() {
     const { data } = this;
-    const activeDate = moment(data.ACTIVE_DATE).format('DD/MM/YYYY');
-    const realDate = moment(data.REAL_DATE).format('DD/MM/YYYY');
+    const activeDate = moment( Number.parseInt(data.ACTIVE_DATE as string)*1000).format('DD/MM/YYYY');
+    const realDate = moment( Number.parseInt(data.REAL_DATE as string)*1000).format('DD/MM/YYYY');
     this.data.ACTIVE_DATE = `data:to_date('${activeDate}', 'DD/MM/YYYY')`;
     this.data.CREATED_TIME = "data:CURRENT_TIMESTAMP";
     this.data.REAL_DATE = `data:to_date('${realDate}', 'DD/MM/YYYY')`;

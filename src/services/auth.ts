@@ -98,7 +98,6 @@ async function register(data: {
   }) {
     const pwd = await encryptPassword(data.password);
     delete data.password;
-    console.log(data);
     return await new AccountModel({...data, pwd}).save();
   // const _id = await Counter.incrementCount(type.increment.registerAccount);
 

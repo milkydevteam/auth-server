@@ -30,6 +30,8 @@ export default class UserModel extends ModelBase<UserType> {
     super(_data, _options);
     this.tableName = 'CMS_USER';
   }
+  manySave = async () => {
+  }
   save = async () => {
     try {
       const params = {
