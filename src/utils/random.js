@@ -10,4 +10,12 @@ function generateRandomString(length, allowedChars) {
   return text;
 }
 
-module.exports = { generateRandomString };
+function generateRandomNumber(length) {
+  let text = '';
+  for (let i = 0; i < length; i += 1) {
+    text += Math.floor(Math.random() *10);
+  }
+  return text;
+} 
+
+module.exports = { generateRandomString,generateRandomNumber };

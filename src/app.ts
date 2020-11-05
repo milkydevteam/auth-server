@@ -8,7 +8,6 @@ const cors = require('cors');
 import errorHandler from './middlewares/errorHandler';
 import camelcaseRequest from './middlewares/camelCaseReq';
 import snakecaseResponse from './middlewares/snakeCaseRes';
-
 import authRoutes from './routes/authRoute';
 import userRoutes from './routes/userRoutes';
 
