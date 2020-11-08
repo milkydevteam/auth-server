@@ -1,15 +1,26 @@
-export const generateHSMMessage = ({so_tham_chieu, pan,expire_date,service_code}: {so_tham_chieu: string, pan: string, expire_date: string, service_code: number}) => {
-    const CVV_A_KEY = 'D9CDB44E5E7ED637';
-    const CVV_B_KEY = '8D0DA9BB882BD590';
-    let ascii = `${so_tham_chieu}CW${CVV_A_KEY}${CVV_B_KEY}${pan};${expire_date}${service_code}`;
-    ascii = `${String.fromCharCode(ascii.length)}${ascii}`.toUpperCase();
-    let hexMsg = '';
-    for(let i = 0; i < ascii.length; i++) {
-        hexMsg += Number(ascii.charCodeAt(i)).toString(16).toLocaleUpperCase();
-    }
-    hexMsg = `00${hexMsg}`;
-    return hexMsg;
+const net = require('net');
+let connected = false;
+const client = new net.Socket();
+
+export const connectTCP = () => {
+client.connect(7504, '10.1.136.39', function() {
+    connected = true;
+	console.log('Connected');
+	client.write(generateHSMMessage1());
+});
+
+client.on('data', function(data) {
+	console.log('Received: ' + data);
+	client.destroy(); // kill client after server's response
+});
+
+client.on('close', function() {
+    connected = false;
+	console.log('Connection closed');
+});
 }
+
+
 
 const getPanTemplate = (pan: string) => {
   const template = 'xxxxxxxx xxxxxxxx xxx';
@@ -25,6 +36,35 @@ const getPanTemplate = (pan: string) => {
   }
   return str;
 }
+
+export const generateHSMMessage = ({so_tham_chieu, pan,expire_date,service_code}: {so_tham_chieu: string, pan: string, expire_date: string, service_code: number}) => {
+    const CVV_A_KEY = 'D9CDB44E5E7ED637';
+    const CVV_B_KEY = '8D0DA9BB882BD590';
+    let ascii = `${so_tham_chieu}CW${CVV_A_KEY}${CVV_B_KEY}${pan};${expire_date}${service_code}`;
+    ascii = `${String.fromCharCode(ascii.length)}${ascii}`.toUpperCase();
+    let hexMsg = '';
+    for(let i = 0; i < ascii.length; i++) {
+        hexMsg += Number(ascii.charCodeAt(i)).toString(16).toLocaleUpperCase();
+    }
+    hexMsg = `00${hexMsg}`;
+   
+    return hexMsg;
+}
+
+export const generateHSMMessage1 = () => {
+    const CVV_A_KEY = 'D9CDB44E5E7ED637';
+    const CVV_B_KEY = '8D0DA9BB882BD590';
+    let ascii = `1234CW${CVV_A_KEY}${CVV_B_KEY}${'9704366809876543212'};${"11/22"}${'101'}`;
+    ascii = `${String.fromCharCode(ascii.length)}${ascii}`.toUpperCase();
+    let hexMsg = '';
+    for(let i = 0; i < ascii.length; i++) {
+        hexMsg += Number(ascii.charCodeAt(i)).toString(16).toLocaleUpperCase();
+    }
+    hexMsg = `00${hexMsg}`;
+    console.log(hexMsg)
+    return hexMsg;
+}
+
 
 const getPan = () => {
     const product_code = '970436';
