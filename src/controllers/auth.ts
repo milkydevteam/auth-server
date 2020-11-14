@@ -6,6 +6,7 @@ import { MyRequest } from '../constants/type';
 import { validatePassword } from '../utils/validate';
 import { checkUserField, checkAuthField } from '../utils/check';
 import { defaultPwd } from '../constants/config';
+import Encryption from '../utils/encrypt';
 export async function createAccount(data) {
   checkAuthField(data, 'create');
   let {
@@ -52,6 +53,14 @@ export async function createAccount(data) {
     userName
   })
 
+}
+
+export async function getLicense(req, res) {
+  const token  = new Encryption().encryptedObjectData(req.body)
+  return res.send({
+    status: 1,
+    result: token
+  })
 }
 
 export async function login(req, res) {

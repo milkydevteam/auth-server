@@ -10,6 +10,7 @@ import camelcaseRequest from './middlewares/camelCaseReq';
 import snakecaseResponse from './middlewares/snakeCaseRes';
 import authRoutes from './routes/authRoute';
 import userRoutes from './routes/userRoutes';
+import roleRoutes from './routes/roleRoute';
 
 require('./models');
 
@@ -26,6 +27,7 @@ app.use(snakecaseResponse());
 
 app.use('/', authRoutes);
 app.use('/users', userRoutes);
+app.use('/roles', roleRoutes);
 
 app.use('/connect', (req, res) => {
   res.send(`

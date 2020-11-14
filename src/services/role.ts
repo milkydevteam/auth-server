@@ -1,14 +1,14 @@
+import errorCode from "src/constants/errors/code";
+import RoleModel from "../models/RoleModel";
+
 export const isPermissionBelongsToRole = (roleId: number, perId: number) => {
   return true;
 };
-export const updateRole = (roleId: number, fields: any) => {
-  // TODO
+
+export const addRole = (data: {name: string, code: string}) => {
+  return new RoleModel({role_code: data.code, role_name: data.name}).save();
 };
 
-export const addRole = (data: {name: string, code: string, permissions: string}) => {
-  // TODO
-};
-
-export const getRole = (roleId: number) => {
-  // TODO
+export const getRoles = () => {
+  return new RoleModel({}).findAll();
 };

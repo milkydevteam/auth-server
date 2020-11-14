@@ -6,6 +6,7 @@ import asyncMiddleware from '../middlewares/async';
 const router = Router();
 
 router.get('/verify', auth, asyncMiddleware(authController.verifyAccessToken));
+router.get('/license',  asyncMiddleware(authController.getLicense));
 router.get(
   '/refresh-token',
   auth,
