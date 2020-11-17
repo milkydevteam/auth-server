@@ -1,5 +1,4 @@
 import ModelBase from './ModelBase';
-
 interface RoleType {
   ROLE_ID?: number;
   ROLE_CODE?: string;
@@ -7,9 +6,9 @@ interface RoleType {
 }
 
 interface RoleNotConvert {
-  role_id?: number;
-  role_code?: string;
-  role_name?: string;
+  roleId?: number;
+  roleCode?: string;
+  roleName?: string;
 }
 
 export default class RoleModel extends ModelBase<RoleType> {
@@ -31,8 +30,9 @@ export default class RoleModel extends ModelBase<RoleType> {
       from ${this.tableName}
     `;
     const rs = await this.execute(query);
-    const _data: RoleType | undefined = rs.rows[0];
-    return _data;
+    const _data: RoleType[] | undefined = rs.rows;
+    
+    return _data.filter(role => role.ROLE_CODE !== 'cms_root_sys');
   }
   getValue(field: string) {}
 }

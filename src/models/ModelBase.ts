@@ -1,6 +1,7 @@
 import oracleConnect from '.';
 import { transformObjectId } from '../middlewares/snakeCaseRes';
 import CustomError from '../constants/errors/CustomError';
+import OracleDB = require('oracledb');
 const snakecaseKeys = require('snakecase-keys');
 
 export default class ModelBase<T> {
@@ -12,6 +13,11 @@ export default class ModelBase<T> {
     autoCommit: true,
   };
   connect = oracleConnect.conn;
+  connProm = oracleConnect.connProm;
+  execute = (query: string, binds?: any, options?: OracleDB.ExecuteOptions) => {
+    return oracleConnect.excuteQuery(query, binds || [], options);
+  };
+
   constructor(_data, _options?: any) {
     if (!_data) throw new CustomError('INTERNAL_SERVER_ERROR');
     this.convertData(_data);
@@ -53,27 +59,11 @@ export default class ModelBase<T> {
       )
       .join(',')}) ${moreQuery || ''}`;
       console.log(query)
-    return await this.connect.execute(query, params || [], {
+    return await this.execute(query, params || [], {
       ...this.options
     });
   }
 
-  public async execute(query: string, params?: any) {
-    try {
-      if (!this.connect) {
-        await oracleConnect.connProm;
-        this.connect = oracleConnect.conn;
-      }
-      console.log('query: ', query, '\noptions: ', this.options);
-
-      const _data = await this.connect.execute(query, params || [], { ...this.options });
-      this.meta = _data.metaData;
-      return _data;
-    } catch (error) {
-      console.log('execute', error);
-      throw new Error(error);
-    }
-  }
 
   public async find(condition: string, fields: string[], limit?: number) {
     const query = `
@@ -82,6 +72,6 @@ export default class ModelBase<T> {
       ${limit ? `FETCH FIRST ${limit} ROW ONLY` : ''}
     `;
     const rs = await this.execute(query);
-    return rs.rows;
+    return rs;
   }
 }

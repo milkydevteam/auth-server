@@ -5,6 +5,10 @@ const bodyParser = require('body-parser');
 // const expressValidator = require('express-validator');
 const morgan = require('morgan');
 const cors = require('cors');
+
+const multer = require('multer');
+const upload = multer();
+
 import errorHandler from './middlewares/errorHandler';
 import camelcaseRequest from './middlewares/camelCaseReq';
 import snakecaseResponse from './middlewares/snakeCaseRes';
@@ -20,7 +24,9 @@ app.use(cors());
 app.use(compression());
 app.use(morgan('dev'));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(upload.array()); 
 // app.use(expressValidator());
 app.use(camelcaseRequest);
 app.use(snakecaseResponse());

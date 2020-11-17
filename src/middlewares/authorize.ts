@@ -5,7 +5,7 @@ import asyncMiddleware from './async';
 // const Permission = require('../models/permission');
 
 async function authorize(req, res, next) {
-  const { account } = req;
+  const { user } = req;
   const {
     method,
     route: { path: routePath },
