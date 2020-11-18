@@ -2,9 +2,9 @@ export default class Encryption {
   static a0 = 1;
   static a21 = 3;
   static k1 =
-    "0123456789zxcvbnmasdfghjklqwertyuiopZXCVBNMASDFGHJKLQWERTYUIOP=-";
+    "0123456789zxcvbnmasdfghjklqwrtyuiopZXCVBNMASDFGHJKLQWERTYUIOP=-.";
   static k2 = "314838954267";
-  static flag = "_";
+  static flag = "e";
   public initial(_msg: string) {
     const addIndex = Number.parseInt(
       _msg.substring(_msg.length - 1, _msg.length)
