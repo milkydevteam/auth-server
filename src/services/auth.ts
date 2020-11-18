@@ -120,7 +120,7 @@ async function login(userName, password) {
 
   const accessToken = await generateAccessToken({
     userId,
-    name: `${user.FIRST_NAME} ${user.MIDDLE_NAME} ${user.LAST_NAME}`,
+    name: `${user.FIRST_NAME || ''} ${user.MIDDLE_NAME || ''} ${user.LAST_NAME}`,
   });
   return { user, accessToken };
 }
@@ -175,20 +175,16 @@ async function changePassword(
   newPassword,
   isManager = false,
 ) {
-  const user = await User.findById(userId);
+  const user = await new AccountModel({userId}).findOneUser(true);
   if (!user) throw new CustomError('USER_NOT_FOUND');
-  const userData = user.toJSON();
   const isCorrectPassword = await compareBcrypt(
     hashSHA512(password),
-    decrypt(userData.password),
+    decrypt(user.PWD),
   );
-  if (!isCorrectPassword && !isManager)
+  if (!isCorrectPassword)
     throw new CustomError('DIFFERENT_PASSWORD');
-
-  await User.findByIdAndUpdate(userId, {
-    password: await encryptPassword(newPassword),
-  });
-  return { status: 1 };
+    if(password === newPassword) throw new CustomError('BAD_REQUEST', {message: 'New password have to different current password'});
+  return new AccountModel({userId, pwd: await encryptPassword(newPassword) }).updatePwd();
 }
 
 async function resetPassword(body, isManager = false) {

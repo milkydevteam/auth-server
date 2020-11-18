@@ -14,6 +14,7 @@ async function auth(req, res, next) {
     req.user = {
       ...data,
     };
+    console.log(req.user);
   }
   if (['/auths/logout', '/auths/verify'].includes(req.path)) {
     req.accessToken = accessToken;

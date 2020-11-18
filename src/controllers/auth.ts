@@ -133,8 +133,19 @@ export async function verifyAccessToken(req: Request, res: Response) {
 }
 
 export async function changePassword(req, res) {
-  // const { password, newPassword, userId } = req.body;
-  // await authService.changePassword(userId, password, newPassword);
-  console.log(req.user);
-  return res.send({ status: 1, user: req.user });
+  const { password, newPassword, userId: tmpUserId } = req.body;
+  const {userId: currentUserId, roles} = req.user;
+  let userId = currentUserId;
+  if(currentUserId !== tmpUserId) {
+    if(roles === 1 || roles === 2) {
+      userId = tmpUserId;
+    } else {
+      throw new CustomError('FORBIDDEN');
+    }
+  } 
+  if(!validatePassword(password))  throw new CustomError('BAD_REQUEST', {message: 'Password is invalid'});
+  if(!validatePassword(newPassword))  throw new CustomError('BAD_REQUEST', {message: 'New password is invalid'});
+  const rs = await authService.changePassword(userId, password, newPassword);
+  if(!rs) throw new CustomError('USER_NOT_FOUND')
+  return res.send({ status: 1 });
 }

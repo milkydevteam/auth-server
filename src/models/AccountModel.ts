@@ -60,5 +60,12 @@ export default class AccountModel extends ModelBase<AccountType> {
     const _data: AccountType | undefined = rs.rows[0];
     return _data;
   }
+
+  async updatePwd() {
+    const query = `update cms_account set pwd = '${this.data.PWD}' where user_id = ${this.data.USER_ID}`;
+    const rs = await this.execute(query);
+    return rs.rowsAffected !== 0;
+  }
+
   getValue(field: string) {}
 }
